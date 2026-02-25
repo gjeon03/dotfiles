@@ -8,6 +8,9 @@
 # macOS
 .DS_Store
 
+# Karabiner auto-generated
+karabiner/automatic_backups/
+
 # Secrets
 .env
 *.pem

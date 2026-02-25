@@ -28,6 +28,10 @@ dotfiles/
 │   └── .config/nvim/              # → ~/.config/nvim/
 │       ├── init.lua
 │       └── lua/user/              # plugins, core, lsp
+├── karabiner/                     # Karabiner-Elements 키보드 설정
+│   └── .config/karabiner/         # → ~/.config/karabiner/
+├── yazi/                          # Yazi 파일 매니저 설정
+│   └── .config/yazi/              # → ~/.config/yazi/
 ├── claude/                        # Claude Code 설정
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
@@ -53,7 +57,7 @@ dotfiles/
 └── .gitignore
 ```
 
-향후 추가 예정: `karabiner/`, `yazi/` 등.
+향후 추가 예정: `git/` 등.
 
 ---
 

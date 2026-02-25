@@ -188,8 +188,8 @@ main() {
     zsh
     tmux
     nvim
-    # karabiner
-    # yazi
+    karabiner
+    yazi
   )
 
   for pkg in "${packages[@]}"; do
