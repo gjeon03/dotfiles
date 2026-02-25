@@ -127,7 +127,7 @@ setup_claude_mcp() {
     if claude mcp list 2>/dev/null | grep -q "$name"; then
       info "MCP: $name (already configured)"
     else
-      if claude mcp add --scope user "$name" "$cmd" $args 2>/dev/null; then
+      if claude mcp add --scope user "$name" -- "$cmd" $args 2>/dev/null; then
         info "MCP: $name (added)"
       else
         warn "MCP: $name (failed to add — run manually: claude mcp add --scope user $name $cmd $args)"
