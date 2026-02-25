@@ -46,6 +46,12 @@ check_deps() {
     IFS='|' read -r cmd desc install_cmd <<< "$entry"
     if command -v "$cmd" &>/dev/null; then
       info "$desc ($cmd) found"
+    elif command -v brew &>/dev/null; then
+      read -rp "[?] $desc ($cmd) not found. Install via Homebrew? [y/N] " answer
+      if [[ "$answer" =~ ^[Yy]$ ]]; then
+        $install_cmd
+        info "$desc installed"
+      fi
     else
       warn "$desc ($cmd) not found. Install: $install_cmd"
     fi
