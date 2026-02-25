@@ -63,7 +63,15 @@
 
 ## Task Management
 
-모든 작업은 `~/.claude/tasks/`에 프로젝트별 마크다운으로 기록한다.
+의미 있는 작업은 `~/.claude/tasks/`에 프로젝트별 마크다운으로 기록한다.
+
+### 태스크 관리 대상
+- 기능 추가, 버그 수정, 리팩토링, 설정 변경 등 결과물이 남는 작업
+- 여러 단계가 필요하거나 세션을 넘길 수 있는 작업
+
+### 태스크 관리 안 함
+- 타이포 수정, 변수명 변경, 단순 질문/답변
+- 1~2분 내로 끝나는 사소한 작업
 
 ### 작업 시작 시
 1. `~/.claude/tasks/<project-name>.md` 파일을 읽는다 (없으면 생성)
@@ -83,12 +91,11 @@
 - git이 아니거나 remote가 없으면 현재 디렉토리명 사용
 - 프로젝트와 무관한 작업은 `_global.md`에 기록
 
-### 이 규칙은 항상 적용된다
-- `/task` 커맨드를 사용하지 않아도 자동으로 수행
-- 사용자가 명시적으로 "태스크 관리 하지 마" 라고 하지 않는 한 항상 수행
+### 이 규칙은 자동으로 적용된다
+- `/task` 커맨드 없이도 대상 작업이면 자동으로 수행
+- 사용자가 명시적으로 "태스크 관리 하지 마" 라고 하면 해당 세션에서 중지
 
 ## Hard Rules
 
 - **NEVER** commit files containing secrets (.env, credentials, API keys)
 - **NEVER** delete uncommitted changes without explicit confirmation
-- **ALWAYS** read and update task file at start and end of work
