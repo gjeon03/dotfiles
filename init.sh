@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — Idempotent dotfiles bootstrap
+# init.sh — Idempotent dotfiles bootstrap
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -10,10 +10,10 @@ git clone https://github.com/<username>/dotfiles ~/dotfiles
 cd ~/dotfiles
 
 # 2. 설치
-./install.sh
+./init.sh
 ```
 
-`install.sh`가 순서대로 수행하는 작업:
+`init.sh`가 순서대로 수행하는 작업:
 
 1. **Prerequisites** — Homebrew, GNU Stow 확인 (없으면 설치 안내)
 2. **Homebrew packages** — `Brewfile`로 CLI 도구, 폰트, 앱 일괄 설치
@@ -60,7 +60,7 @@ dotfiles/
 │           ├── test.md
 │           └── think.md
 ├── Brewfile                       # Homebrew 패키지 선언 (brew bundle)
-├── install.sh                     # 멱등성 부트스트랩 스크립트
+├── init.sh                     # 멱등성 부트스트랩 스크립트
 ├── CLAUDE.md                      # 이 레포 자체의 Claude Code 지시 파일
 ├── README.md
 └── .gitignore
@@ -156,7 +156,7 @@ dotfiles/
 
 ### MCP 서버
 
-MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth 토큰 등도 포함되어 **심링크/버전관리가 불가**하다. 따라서 `install.sh`에서 `claude mcp add --scope user` 명령어로 등록한다.
+MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth 토큰 등도 포함되어 **심링크/버전관리가 불가**하다. 따라서 `init.sh`에서 `claude mcp add --scope user` 명령어로 등록한다.
 
 | 서버 | 설명 | Transport | 등록 명령어 |
 |------|------|-----------|-------------|
@@ -166,7 +166,7 @@ MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth �
 | Context7 | 라이브러리 최신 문서 주입 | HTTP | `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp` |
 | Supabase | DB 쿼리/마이그레이션 | stdio | `claude mcp add --scope user supabase npx -y @supabase/mcp-server-supabase@latest --access-token <TOKEN>` |
 
-- stdio 서버를 추가하려면 `install.sh`의 `mcp_servers` 배열에 `"이름|명령어|인자"` 형식으로 추가한다.
+- stdio 서버를 추가하려면 `init.sh`의 `mcp_servers` 배열에 `"이름|명령어|인자"` 형식으로 추가한다.
 - HTTP 서버를 추가하려면 `mcp_http_servers` 배열에 `"이름|URL"` 형식으로 추가한다.
 - API 키가 필요한 서버는 `setup_claude_mcp()` 하단에 안내 메시지를 추가한다.
 
@@ -176,9 +176,9 @@ MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth �
 |------|-----------|-------------|------|
 | 플러그인 활성화 | `settings.json` → `enabledPlugins` | O | 토글만 담당 (설치는 별도) |
 | 마켓플레이스 소스 | `settings.json` → `extraKnownMarketplaces` | O | 새 머신에서 플러그인 소스 자동 발견 |
-| 플러그인 설치 (OMC) | `~/.claude/plugins/` | X | `install.sh`에서 CLI로 설치 |
-| 플러그인 설치 (공식) | `~/.claude/plugins/` | X | `install.sh`에서 `claude plugins install`로 설치 |
-| MCP 서버 설정 | `~/.claude.json` | X | `install.sh`에서 CLI로 등록 |
+| 플러그인 설치 (OMC) | `~/.claude/plugins/` | X | `init.sh`에서 CLI로 설치 |
+| 플러그인 설치 (공식) | `~/.claude/plugins/` | X | `init.sh`에서 `claude plugins install`로 설치 |
+| MCP 서버 설정 | `~/.claude.json` | X | `init.sh`에서 CLI로 등록 |
 
 ---
 
@@ -196,7 +196,7 @@ stow -D claude
 stow --restow claude
 
 # 전체 설치
-./install.sh
+./init.sh
 ```
 
 ### 새 패키지 추가하기
@@ -208,13 +208,13 @@ stow --restow claude
 mkdir -p git
 cp ~/.gitconfig git/.gitconfig
 
-# 2. install.sh의 packages 배열에 추가
+# 2. init.sh의 packages 배열에 추가
 # 3. stow git
 ```
 
 ### 충돌 처리
 
-기존 파일이 심링크가 아닌 실제 파일이면 `install.sh`가 자동으로 `.backup.<timestamp>` 백업을 생성한다.
+기존 파일이 심링크가 아닌 실제 파일이면 `init.sh`가 자동으로 `.backup.<timestamp>` 백업을 생성한다.
 
 ---
 

@@ -2,7 +2,7 @@
 *.local
 *.local.*
 
-# Backups created by install.sh
+# Backups created by init.sh
 *.backup.*
 
 # macOS

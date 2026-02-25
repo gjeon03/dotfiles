@@ -14,7 +14,7 @@ claude/          → ~/.claude/ (CLAUDE.md, settings.json, commands/)
 
 ## Commands
 
-- Install all: `./install.sh`
+- Install all: `./init.sh`
 - Install one: `stow <package>`
 - Remove: `stow -D <package>`
 - Update: `stow --restow <package>`
