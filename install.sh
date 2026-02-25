@@ -40,6 +40,8 @@ check_deps() {
   local optional_tools=(
     "gh|GitHub CLI|brew install gh"
     "glab|GitLab CLI|brew install glab"
+    "eza|Modern ls replacement|brew install eza"
+    "lazygit|Git TUI|brew install lazygit"
   )
 
   for entry in "${optional_tools[@]}"; do
@@ -183,9 +185,11 @@ main() {
   # Stow packages (add new packages here)
   local packages=(
     claude
-    # git
-    # zsh
+    zsh
+    tmux
     # nvim
+    # karabiner
+    # yazi
   )
 
   for pkg in "${packages[@]}"; do

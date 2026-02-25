@@ -19,6 +19,11 @@ cd ~/dotfiles
 
 ```
 dotfiles/
+├── zsh/                           # Zsh 쉘 설정
+│   ├── .zshrc                     # → ~/.zshrc
+│   └── .zprofile                  # → ~/.zprofile
+├── tmux/                          # tmux 설정
+│   └── .tmux.conf                 # → ~/.tmux.conf
 ├── claude/                        # Claude Code 설정
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
@@ -44,7 +49,7 @@ dotfiles/
 └── .gitignore
 ```
 
-향후 추가 예정: `git/`, `zsh/`, `nvim/` 등.
+향후 추가 예정: `nvim/`, `karabiner/`, `yazi/` 등.
 
 ---
 
