@@ -35,6 +35,7 @@ dotfiles/
 │           ├── prime.md
 │           ├── reflection.md
 │           ├── setup-project.md
+│           ├── task.md
 │           ├── test.md
 │           └── think.md
 ├── install.sh                     # 멱등성 부트스트랩 스크립트
@@ -118,6 +119,7 @@ dotfiles/
 | `/cleanup` | 미사용 import, 데드 코드, 주석 코드 정리 | `/cleanup src/utils/` |
 | `/reflection` | 세션 분석 → CLAUDE.md 개선점 제안 | `/reflection` |
 | `/setup-project` | 현재 프로젝트에 맞는 CLAUDE.md 자동 생성 | `/setup-project` |
+| `/task` | 프로젝트별 태스크 관리 (추가/시작/완료/아카이브) | `/task`, `/task add 버그 수정`, `/task done 1` |
 | `/test` | 테스트 러너 자동 감지 → 테스트 실행 → 실패 분석 | `/test`, `/test src/auth/` |
 
 ### MCP 서버
