@@ -24,6 +24,10 @@ dotfiles/
 │   └── .zprofile                  # → ~/.zprofile
 ├── tmux/                          # tmux 설정
 │   └── .tmux.conf                 # → ~/.tmux.conf
+├── nvim/                          # Neovim 설정
+│   └── .config/nvim/              # → ~/.config/nvim/
+│       ├── init.lua
+│       └── lua/user/              # plugins, core, lsp
 ├── claude/                        # Claude Code 설정
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
@@ -49,7 +53,7 @@ dotfiles/
 └── .gitignore
 ```
 
-향후 추가 예정: `nvim/`, `karabiner/`, `yazi/` 등.
+향후 추가 예정: `karabiner/`, `yazi/` 등.
 
 ---
 

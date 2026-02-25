@@ -187,7 +187,7 @@ main() {
     claude
     zsh
     tmux
-    # nvim
+    nvim
     # karabiner
     # yazi
   )
