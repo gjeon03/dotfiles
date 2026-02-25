@@ -93,43 +93,13 @@ stow_package() {
 }
 
 # ─── Claude Code: Plugins ────────────────────────────────
+# 플러그인은 settings.json의 enabledPlugins + extraKnownMarketplaces로 관리됨
+# Stow로 settings.json이 심링크되면 Claude Code 재시작 시 자동 적용
 setup_claude_plugins() {
-  if ! command -v claude &>/dev/null; then
-    warn "Claude Code CLI not found. Skipping plugin setup."
-    warn "Install: https://docs.anthropic.com/en/docs/claude-code"
-    return
-  fi
-
   echo ""
   echo "─── Claude Code plugins ───"
-
-  # oh-my-claudecode 마켓플레이스 등록 + 플러그인 설치
-  if ! claude plugins list 2>/dev/null | grep -q "oh-my-claudecode"; then
-    info "Installing oh-my-claudecode plugin..."
-    claude plugins add-marketplace omc --source git --url "https://github.com/Yeachan-Heo/oh-my-claudecode.git" 2>/dev/null || true
-    claude plugins install oh-my-claudecode@omc 2>/dev/null || true
-  fi
-  info "Plugin: oh-my-claudecode"
-
-  # 공식 마켓플레이스(claude-plugins-official) 플러그인
-  local official_plugins=(
-    "context7"
-    "security-guidance"
-    "frontend-design"
-    "playwright"
-  )
-
-  for plugin in "${official_plugins[@]}"; do
-    if claude plugins list 2>/dev/null | grep -q "$plugin"; then
-      info "Plugin: $plugin (already installed)"
-    else
-      if claude plugins install "$plugin" 2>/dev/null; then
-        info "Plugin: $plugin (installed)"
-      else
-        warn "Plugin: $plugin (failed — run manually: claude plugins install $plugin)"
-      fi
-    fi
-  done
+  info "Plugins are managed via settings.json (applied on Claude Code restart)"
+  info "  Enabled: oh-my-claudecode, context7, security-guidance, frontend-design, playwright"
 }
 
 # ─── Claude Code: MCP Servers ────────────────────────────
