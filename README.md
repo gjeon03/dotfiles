@@ -9,9 +9,17 @@ GNU Stow로 관리하는 개인 설정 파일. 새 머신에서 한 번에 환�
 git clone https://github.com/<username>/dotfiles ~/dotfiles
 cd ~/dotfiles
 
-# 2. 설치 (stow 없으면 자동 설치 안내)
+# 2. 설치
 ./install.sh
 ```
+
+`install.sh`가 순서대로 수행하는 작업:
+
+1. **Prerequisites** — Homebrew, GNU Stow 확인 (없으면 설치 안내)
+2. **Homebrew packages** — `Brewfile`로 CLI 도구, 폰트, 앱 일괄 설치
+3. **Shell setup** — oh-my-zsh, zsh 플러그인, Powerlevel10k, tmux TPM
+4. **Stow packages** — 6개 패키지 심링크 (`claude`, `zsh`, `tmux`, `nvim`, `karabiner`, `yazi`)
+5. **Claude Code** — 플러그인 안내, MCP 서버 등록
 
 ## Structure
 
@@ -51,6 +59,7 @@ dotfiles/
 │           ├── task.md
 │           ├── test.md
 │           └── think.md
+├── Brewfile                       # Homebrew 패키지 선언 (brew bundle)
 ├── install.sh                     # 멱등성 부트스트랩 스크립트
 ├── CLAUDE.md                      # 이 레포 자체의 Claude Code 지시 파일
 ├── README.md
@@ -58,6 +67,16 @@ dotfiles/
 ```
 
 향후 추가 예정: `git/` 등.
+
+## Brewfile
+
+`brew bundle --file=Brewfile`로 설치되는 패키지 목록.
+
+| 분류 | 패키지 |
+|------|--------|
+| CLI Tools | stow, neovim, tmux, bat, fd, fzf, ripgrep, eza, zoxide, yazi, lazygit, jq, gh, glab, asdf |
+| Fonts | font-jetbrains-mono-nerd-font |
+| Apps | karabiner-elements, wezterm |
 
 ---
 

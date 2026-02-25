@@ -17,7 +17,8 @@ error() { printf "${RED}[✗]${NC} %s\n" "$1"; }
 # ─── Prerequisites ────────────────────────────────────────
 check_deps() {
   if [[ "$(uname)" == "Darwin" ]] && ! command -v brew &>/dev/null; then
-    warn "Homebrew not found. Install: https://brew.sh"
+    error "Homebrew not found. Install: https://brew.sh"
+    exit 1
   fi
 
   if ! command -v stow &>/dev/null; then
@@ -35,29 +36,81 @@ check_deps() {
       exit 1
     fi
   fi
+}
 
-  # 선택적 CLI 도구 (없으면 안내만)
-  local optional_tools=(
-    "gh|GitHub CLI|brew install gh"
-    "glab|GitLab CLI|brew install glab"
-    "eza|Modern ls replacement|brew install eza"
-    "lazygit|Git TUI|brew install lazygit"
-  )
+# ─── Homebrew Packages ───────────────────────────────────
+install_brew_packages() {
+  if ! command -v brew &>/dev/null; then
+    return
+  fi
 
-  for entry in "${optional_tools[@]}"; do
-    IFS='|' read -r cmd desc install_cmd <<< "$entry"
-    if command -v "$cmd" &>/dev/null; then
-      info "$desc ($cmd) found"
-    elif command -v brew &>/dev/null; then
-      read -rp "[?] $desc ($cmd) not found. Install via Homebrew? [y/N] " answer
-      if [[ "$answer" =~ ^[Yy]$ ]]; then
-        $install_cmd
-        info "$desc installed"
-      fi
-    else
-      warn "$desc ($cmd) not found. Install: $install_cmd"
+  echo ""
+  echo "─── Homebrew packages ───"
+
+  if [[ ! -f "$DOTFILES_DIR/Brewfile" ]]; then
+    warn "Brewfile not found. Skipping."
+    return
+  fi
+
+  read -rp "[?] Install Homebrew packages from Brewfile? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    brew bundle --file="$DOTFILES_DIR/Brewfile"
+    info "Homebrew packages installed"
+  else
+    info "Skipped Homebrew packages"
+  fi
+}
+
+# ─── Shell & Plugin Setup ────────────────────────────────
+setup_shell() {
+  echo ""
+  echo "─── Shell setup ───"
+
+  # oh-my-zsh
+  if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+    read -rp "[?] Install oh-my-zsh? [y/N] " answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+      info "oh-my-zsh installed"
     fi
-  done
+  else
+    info "oh-my-zsh (already installed)"
+  fi
+
+  # zsh plugins
+  local ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+  if [[ -d "$HOME/.oh-my-zsh" ]]; then
+    if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]]; then
+      git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+      info "zsh-syntax-highlighting installed"
+    else
+      info "zsh-syntax-highlighting (already installed)"
+    fi
+
+    if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]]; then
+      git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+      info "zsh-autosuggestions installed"
+    else
+      info "zsh-autosuggestions (already installed)"
+    fi
+
+    # Powerlevel10k theme
+    if [[ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]]; then
+      git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
+      info "Powerlevel10k installed"
+    else
+      info "Powerlevel10k (already installed)"
+    fi
+  fi
+
+  # tmux TPM
+  if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    info "tmux TPM installed (run prefix + I inside tmux to install plugins)"
+  else
+    info "tmux TPM (already installed)"
+  fi
 }
 
 # ─── Backup & Stow ───────────────────────────────────────
@@ -181,6 +234,11 @@ main() {
   echo ""
 
   check_deps
+  install_brew_packages
+  setup_shell
+
+  echo ""
+  echo "─── Stow packages ───"
 
   # Stow packages (add new packages here)
   local packages=(
