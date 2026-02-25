@@ -1,0 +1,57 @@
+{
+  "alwaysThinkingEnabled": true,
+  "cleanupPeriodDays": 365,
+  "enableAllProjectMcpServers": false,
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); user=$(whoami); host=$(hostname -s); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); model=$(echo \"$input\" | jq -r '.model.display_name'); style=$(echo \"$input\" | jq -r '.output_style.name'); cost=$(echo \"$input\" | jq -r '.cost.total_cost_usd // \"0.00\"'); if [ -d \"$cwd/.git\" ]; then branch=$(cd \"$cwd\" && git branch --show-current 2>/dev/null); git_info=\" (${branch:-unknown})\"; else git_info=\"\"; fi; printf \"\\033[2m%s@%s:%s%s | %s [%s] | Cost: $%s\\033[0m\" \"$user\" \"$host\" \"$(basename \"$cwd\")\" \"$git_info\" \"$model\" \"$style\" \"$cost\""
+  },
+  "enabledPlugins": {
+    "oh-my-claudecode@omc": true,
+    "context7": true,
+    "security-guidance": true,
+    "frontend-design": true,
+    "playwright": true
+  },
+  "extraKnownMarketplaces": {
+    "omc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/Yeachan-Heo/oh-my-claudecode.git"
+      }
+    }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "worktree": {
+    "symlinkDirectories": ["node_modules", ".next", "dist", "build", ".turbo", ".dart_tool"]
+  },
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~*)",
+      "Bash(sudo rm *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(mkfs *)",
+      "Bash(dd if=*)",
+      "Read(~/.ssh/*)",
+      "Read(~/.aws/*)",
+      "Read(~/.gnupg/*)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\" sound name \"Ping\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

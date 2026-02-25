@@ -1,0 +1,14 @@
+# Machine-specific overrides
+*.local
+*.local.*
+
+# Backups created by install.sh
+*.backup.*
+
+# macOS
+.DS_Store
+
+# Secrets
+.env
+*.pem
+*.key
