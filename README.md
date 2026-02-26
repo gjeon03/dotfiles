@@ -201,8 +201,9 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 - **코드 스타일**: TypeScript strict, named exports, indent 규칙
 - **패키지 매니저**: lock 파일 기반 자동 감지 (없으면 pnpm 기본)
 - **프레임워크**: 기존 프로젝트 설정 우선, 새 프로젝트는 App Router + Tailwind v4
-- **Git**: Conventional Commits, `--no-verify`/force push 금지
+- **Git**: Conventional Commits (한글 메시지), `--no-verify`/force push 금지
 - **의사결정 프레임워크**: 자율 실행 / 제안 후 진행 / 반드시 물어보기 3단계
+- **태스크 관리**: 프로젝트 루트 `tasks/`에 태스크별 파일, 완료 시 `done/YYYY-MM-DD/`로 이동
 
 > 프로젝트별 설정은 글로벌에 넣지 않는다. `/setup-project` 커맨드로 각 프로젝트에 맞는 CLAUDE.md를 생성한다.
 
@@ -261,7 +262,7 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 | `/cleanup` | 미사용 import, 데드 코드, 주석 코드 정리 | `/cleanup src/utils/` |
 | `/reflection` | 세션 분석 → CLAUDE.md 개선점 제안 | `/reflection` |
 | `/setup-project` | 현재 프로젝트에 맞는 CLAUDE.md 자동 생성 | `/setup-project` |
-| `/task` | 프로젝트별 태스크 관리 (추가/시작/완료/아카이브) | `/task`, `/task add 버그 수정`, `/task done 1` |
+| `/task` | 프로젝트별 태스크 관리 (`tasks/` 디렉토리, 완료 시 `done/날짜/`로 이동) | `/task`, `/task add 버그 수정`, `/task done slug` |
 | `/test` | 테스트 러너 자동 감지 → 테스트 실행 → 실패 분석 | `/test`, `/test src/auth/` |
 
 ### MCP 서버
