@@ -186,6 +186,7 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 |----------|------|
 | `cl` | `claude` |
 | `cls` | `claude --dangerously-skip-permissions` |
+| `clst` | `claude --dangerously-skip-permissions --teammate-mode tmux` |
 
 ---
 

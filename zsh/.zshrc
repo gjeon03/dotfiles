@@ -65,6 +65,7 @@ alias mv="mv -i"
 # ─── Claude Code ─────────────────────────────────────────
 alias cl="claude"
 alias cls="claude --dangerously-skip-permissions"
+alias clst="claude --dangerously-skip-permissions --teammate-mode tmux"
 
 # ─── asdf ────────────────────────────────────────────────
 if [[ -n "$HOMEBREW_PREFIX" && -f "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh" ]]; then
