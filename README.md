@@ -93,11 +93,31 @@ dotfiles/
 
 `brew bundle --file=Brewfile`로 설치. cask는 `OS.mac?` 가드로 macOS에서만 설치.
 
-| 분류 | 패키지 |
-|------|--------|
-| CLI Tools | stow, neovim, tmux, bat, fd, fzf, ripgrep, eza, zoxide, yazi, lazygit, jq, gh, glab, asdf |
-| Fonts (macOS) | font-jetbrains-mono-nerd-font |
-| Apps (macOS) | karabiner-elements, wezterm |
+| 패키지 | 설명 |
+|--------|------|
+| `stow` | Dotfiles 심링크 매니저 |
+| `neovim` | 에디터 |
+| `tmux` | 터미널 멀티플렉서 |
+| `bat` | `cat` 대체 (구문 강조) |
+| `fd` | `find` 대체 (빠른 파일 탐색) |
+| `fzf` | 퍼지 파인더 |
+| `ripgrep` | `grep` 대체 (빠른 텍스트 검색) |
+| `eza` | `ls` 대체 (아이콘, git 상태) |
+| `zoxide` | `cd` 대체 (최근 디렉토리 기억) |
+| `yazi` | 터미널 파일 매니저 |
+| `lazygit` | Git TUI 클라이언트 |
+| `jq` | JSON 프로세서 |
+| `gh` | GitHub CLI |
+| `glab` | GitLab CLI |
+| `asdf` | 런타임 버전 매니저 |
+
+**macOS 전용 (cask):**
+
+| 패키지 | 설명 |
+|--------|------|
+| `font-jetbrains-mono-nerd-font` | Nerd Font 패치 개발 폰트 |
+| `karabiner-elements` | 키보드 커스터마이징 |
+| `wezterm` | GPU 가속 터미널 |
 
 ### Linux 패키지 파일
 
