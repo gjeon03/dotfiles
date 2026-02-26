@@ -29,7 +29,8 @@
 
 - Conventional Commits: `type(scope): description`
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`
-- Commit messages in English, concise.
+- 커밋 메시지는 한글로, 간결하게. 타입/스코프는 영어 유지: `feat(init): 프로필 선택 추가`
+- Co-Authored-By 트레일러 포함하지 않음
 - **NEVER use `--no-verify`**
 - **NEVER force push to main/master**
 - **NEVER amend published commits**
