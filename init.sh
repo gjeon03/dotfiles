@@ -238,7 +238,7 @@ stow_package() {
   done < <(find "$DOTFILES_DIR/$pkg" -type f -print0)
 
   cd "$DOTFILES_DIR"
-  stow --restow "$pkg"
+  stow --restow -t "$HOME" "$pkg"
   info "Stowed: $pkg"
 }
 
