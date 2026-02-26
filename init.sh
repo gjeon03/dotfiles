@@ -311,31 +311,23 @@ setup_claude_mcp() {
   fi
 }
 
-# ─── Main ─────────────────────────────────────────────────
-main() {
-  echo "─── dotfiles install ───"
-  echo "  OS: $OS"
-  echo ""
-
-  check_deps
+# ─── Profile: System ─────────────────────────────────────
+run_system() {
   install_packages
   choose_shell
   setup_shell
 
   echo ""
-  echo "─── Stow packages ───"
+  echo "─── Stow packages (system) ───"
 
-  # Base packages (all platforms)
-  local packages=(claude tmux nvim yazi)
+  local packages=(tmux nvim yazi)
 
-  # Shell package
   if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
     packages+=(zsh)
   else
     packages+=(bash)
   fi
 
-  # macOS-only packages
   if [[ "$OS" == "Darwin" ]]; then
     packages+=(karabiner)
   fi
@@ -343,10 +335,79 @@ main() {
   for pkg in "${packages[@]}"; do
     stow_package "$pkg"
   done
+}
 
-  # Claude Code setup (plugins + MCP)
+# ─── Profile: Claude Code ───────────────────────────────
+run_claude() {
+  echo ""
+  echo "─── Stow packages (claude) ───"
+  stow_package claude
+
   setup_claude_plugins
   setup_claude_mcp
+}
+
+# ─── Main ─────────────────────────────────────────────────
+PROFILE=""
+
+usage() {
+  echo "Usage: ./init.sh [--system|--claude|--all]"
+  echo ""
+  echo "  --system   Shell, packages, and tool configs only"
+  echo "  --claude   Claude Code settings only"
+  echo "  --all      Both (no prompt)"
+  echo "  (none)     Interactive selection"
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --system) PROFILE="system" ;;
+      --claude) PROFILE="claude" ;;
+      --all)    PROFILE="all" ;;
+      -h|--help) usage; exit 0 ;;
+      *) error "Unknown option: $1"; usage; exit 1 ;;
+    esac
+    shift
+  done
+}
+
+main() {
+  parse_args "$@"
+
+  echo "─── dotfiles install ───"
+  echo "  OS: $OS"
+  echo ""
+
+  check_deps
+
+  # Interactive profile selection
+  if [[ -z "$PROFILE" ]]; then
+    echo "What to set up?"
+    echo "  1) All        — system + Claude Code"
+    echo "  2) System     — shell, packages, tools"
+    echo "  3) Claude     — Claude Code settings"
+    read -rp "[?] Choose [1/2/3] (default: 1) " answer
+    case "$answer" in
+      2) PROFILE="system" ;;
+      3) PROFILE="claude" ;;
+      *) PROFILE="all" ;;
+    esac
+    echo ""
+  fi
+
+  case "$PROFILE" in
+    system)
+      run_system
+      ;;
+    claude)
+      run_claude
+      ;;
+    all)
+      run_system
+      run_claude
+      ;;
+  esac
 
   echo ""
   info "Done. Restart your shell if needed."
