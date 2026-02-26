@@ -1,0 +1,16 @@
+# Fedora/RHEL packages
+# Usage: xargs -a packages.dnf sudo dnf install -y
+stow
+neovim
+tmux
+bat
+fd-find
+fzf
+ripgrep
+eza
+zoxide
+yazi
+lazygit
+jq
+gh
+glab

@@ -2,18 +2,11 @@
 case "$(uname)" in
   Darwin)
     # Homebrew (Apple Silicon / Intel)
-    CPU=$(uname -m)
-    if [[ "$CPU" == "arm64" ]]; then
+    if [[ -f /opt/homebrew/bin/brew ]]; then
       eval "$(/opt/homebrew/bin/brew shellenv)"
-    else
+    elif [[ -f /usr/local/bin/brew ]]; then
       eval "$(/usr/local/bin/brew shellenv)"
     fi
-
-    alias ibrew="arch -x86_64 /usr/local/bin/brew"
-    alias abrew="arch -arm64 /opt/homebrew/bin/brew"
-
-    # VS Code CLI
-    export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
     ;;
   Linux)
     # Linuxbrew (if installed)
@@ -25,5 +18,8 @@ case "$(uname)" in
     ;;
 esac
 
-# ─── PATH ─────────────────────────────────────────────────
-export PATH="$PATH:/usr/local/bin"
+# ─── Source .bashrc ───────────────────────────────────────
+[[ -f "$HOME/.bashrc" ]] && source "$HOME/.bashrc"
+
+# ─── Local overrides (not tracked) ───────────────────────
+[[ -f "$HOME/.bash_profile.local" ]] && source "$HOME/.bash_profile.local"

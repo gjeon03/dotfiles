@@ -1,4 +1,4 @@
-# ─── CLI Tools ────────────────────────────────────────────
+# ─── CLI Tools (macOS + Linuxbrew) ────────────────────────
 brew "stow"           # Dotfiles symlink manager
 brew "neovim"         # Editor
 brew "tmux"           # Terminal multiplexer
@@ -15,9 +15,9 @@ brew "gh"             # GitHub CLI
 brew "glab"           # GitLab CLI
 brew "asdf"           # Version manager
 
-# ─── Fonts ────────────────────────────────────────────────
-cask "font-jetbrains-mono-nerd-font"
-
-# ─── Apps ─────────────────────────────────────────────────
-cask "karabiner-elements"
-cask "wezterm"
+# ─── macOS only ──────────────────────────────────────────
+if OS.mac?
+  cask "font-jetbrains-mono-nerd-font"
+  cask "karabiner-elements"
+  cask "wezterm"
+end

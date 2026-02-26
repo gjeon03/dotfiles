@@ -1,0 +1,16 @@
+# Arch Linux packages
+# Usage: xargs -a packages.pacman sudo pacman -S --needed
+stow
+neovim
+tmux
+bat
+fd
+fzf
+ripgrep
+eza
+zoxide
+yazi
+lazygit
+jq
+github-cli
+glab

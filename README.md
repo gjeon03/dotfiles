@@ -1,6 +1,6 @@
 # dotfiles
 
-GNU Stow로 관리하는 개인 설정 파일. 새 머신에서 한 번에 환경을 복원한다.
+GNU Stow로 관리하는 개인 설정 파일. 새 머신에서 한 번에 환경을 복원한다. macOS와 Linux를 모두 지원하며, zsh/bash 중 선택 가능.
 
 ## Quick Start
 
@@ -15,11 +15,12 @@ cd ~/dotfiles
 
 `init.sh`가 순서대로 수행하는 작업:
 
-1. **Prerequisites** — Homebrew, GNU Stow 확인 (없으면 설치 안내)
-2. **Homebrew packages** — `Brewfile`로 CLI 도구, 폰트, 앱 일괄 설치
-3. **Shell setup** — oh-my-zsh, zsh 플러그인, Powerlevel10k, tmux TPM
-4. **Stow packages** — 6개 패키지 심링크 (`claude`, `zsh`, `tmux`, `nvim`, `karabiner`, `yazi`)
-5. **Claude Code** — 플러그인 안내, MCP 서버 등록
+1. **Prerequisites** — Stow 확인 (macOS: Homebrew 필수, Linux: apt/dnf/pacman으로 설치)
+2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
+3. **Shell selection** — zsh 또는 bash 선택
+4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
+5. **Stow packages** — 선택된 쉘과 OS에 따라 패키지 심링크
+6. **Claude Code** — 플러그인 안내, MCP 서버 등록
 
 ## Structure
 
@@ -30,13 +31,16 @@ dotfiles/
 ├── zsh/                           # Zsh 쉘 설정
 │   ├── .zshrc                     # → ~/.zshrc
 │   └── .zprofile                  # → ~/.zprofile
+├── bash/                          # Bash 쉘 설정
+│   ├── .bashrc                    # → ~/.bashrc
+│   └── .bash_profile              # → ~/.bash_profile
 ├── tmux/                          # tmux 설정
 │   └── .tmux.conf                 # → ~/.tmux.conf
 ├── nvim/                          # Neovim 설정
 │   └── .config/nvim/              # → ~/.config/nvim/
 │       ├── init.lua
 │       └── lua/user/              # plugins, core, lsp
-├── karabiner/                     # Karabiner-Elements 키보드 설정
+├── karabiner/                     # Karabiner-Elements 키보드 설정 (macOS only)
 │   └── .config/karabiner/         # → ~/.config/karabiner/
 ├── yazi/                          # Yazi 파일 매니저 설정
 │   └── .config/yazi/              # → ~/.config/yazi/
@@ -59,8 +63,11 @@ dotfiles/
 │           ├── task.md
 │           ├── test.md
 │           └── think.md
-├── Brewfile                       # Homebrew 패키지 선언 (brew bundle)
-├── init.sh                     # 멱등성 부트스트랩 스크립트
+├── Brewfile                       # Homebrew 패키지 (macOS + Linuxbrew)
+├── packages.apt                   # Debian/Ubuntu 패키지
+├── packages.dnf                   # Fedora/RHEL 패키지
+├── packages.pacman                # Arch Linux 패키지
+├── init.sh                        # 멱등성 부트스트랩 스크립트
 ├── CLAUDE.md                      # 이 레포 자체의 Claude Code 지시 파일
 ├── README.md
 └── .gitignore
@@ -68,15 +75,46 @@ dotfiles/
 
 향후 추가 예정: `git/` 등.
 
-## Brewfile
+## Packages
 
-`brew bundle --file=Brewfile`로 설치되는 패키지 목록.
+### Brewfile (macOS + Linuxbrew)
+
+`brew bundle --file=Brewfile`로 설치. cask는 `OS.mac?` 가드로 macOS에서만 설치.
 
 | 분류 | 패키지 |
 |------|--------|
 | CLI Tools | stow, neovim, tmux, bat, fd, fzf, ripgrep, eza, zoxide, yazi, lazygit, jq, gh, glab, asdf |
-| Fonts | font-jetbrains-mono-nerd-font |
-| Apps | karabiner-elements, wezterm |
+| Fonts (macOS) | font-jetbrains-mono-nerd-font |
+| Apps (macOS) | karabiner-elements, wezterm |
+
+### Linux 패키지 파일
+
+Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
+
+| 파일 | 대상 | 설치 명령 |
+|------|------|-----------|
+| `packages.apt` | Debian/Ubuntu | `apt install` |
+| `packages.dnf` | Fedora/RHEL | `dnf install` |
+| `packages.pacman` | Arch Linux | `pacman -S` |
+
+> 일부 패키지명이 distro마다 다르다 (예: `fd` → `fd-find`, `gh` → `github-cli`).
+
+## Shell 설정
+
+`init.sh` 실행 시 zsh/bash 중 선택. 선택한 쉘만 stow된다.
+
+### zsh (기본)
+
+- oh-my-zsh + Powerlevel10k 테마
+- 플러그인: zsh-syntax-highlighting, zsh-autosuggestions, fzf, asdf
+- `.zshrc.local`로 머신별 오버라이드
+
+### bash
+
+- 프레임워크 없이 순수 bash 설정
+- git-aware PS1 프롬프트
+- zsh와 동일한 알리아스/도구 설정
+- `.bashrc.local`로 머신별 오버라이드
 
 ---
 
@@ -128,7 +166,7 @@ dotfiles/
 | `Read(~/.ssh/*)`, `Read(~/.aws/*)`, `Read(~/.gnupg/*)` | 민감한 인증 정보 읽기 방지 |
 
 **Hooks:**
-- `Notification`: Claude Code가 입력 대기 상태일 때 macOS 데스크톱 알림 발송
+- `Notification`: 입력 대기 시 알림 (macOS: `osascript`, Linux: `notify-send`)
 
 **Status Line:**
 - `user@host:dir (branch) | Model [style] | Cost: $0.00` 형식으로 표시

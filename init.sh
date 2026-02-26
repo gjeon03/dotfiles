@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# init.sh — Idempotent dotfiles bootstrap
+# init.sh — Idempotent dotfiles bootstrap (macOS + Linux)
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OS="$(uname)"
 
 # ─── Colors ───────────────────────────────────────────────
 GREEN='\033[0;32m'
@@ -16,7 +17,7 @@ error() { printf "${RED}[✗]${NC} %s\n" "$1"; }
 
 # ─── Prerequisites ────────────────────────────────────────
 check_deps() {
-  if [[ "$(uname)" == "Darwin" ]] && ! command -v brew &>/dev/null; then
+  if [[ "$OS" == "Darwin" ]] && ! command -v brew &>/dev/null; then
     error "Homebrew not found. Install: https://brew.sh"
     exit 1
   fi
@@ -31,6 +32,30 @@ check_deps() {
       else
         exit 1
       fi
+    elif command -v apt &>/dev/null; then
+      read -rp "Install via apt? [y/N] " answer
+      if [[ "$answer" =~ ^[Yy]$ ]]; then
+        sudo apt install -y stow
+        info "Stow installed"
+      else
+        exit 1
+      fi
+    elif command -v dnf &>/dev/null; then
+      read -rp "Install via dnf? [y/N] " answer
+      if [[ "$answer" =~ ^[Yy]$ ]]; then
+        sudo dnf install -y stow
+        info "Stow installed"
+      else
+        exit 1
+      fi
+    elif command -v pacman &>/dev/null; then
+      read -rp "Install via pacman? [y/N] " answer
+      if [[ "$answer" =~ ^[Yy]$ ]]; then
+        sudo pacman -S --needed stow
+        info "Stow installed"
+      else
+        exit 1
+      fi
     else
       echo "Install stow: https://www.gnu.org/software/stow/"
       exit 1
@@ -38,27 +63,83 @@ check_deps() {
   fi
 }
 
-# ─── Homebrew Packages ───────────────────────────────────
-install_brew_packages() {
-  if ! command -v brew &>/dev/null; then
-    return
-  fi
-
+# ─── Package Installation ────────────────────────────────
+install_packages() {
   echo ""
-  echo "─── Homebrew packages ───"
+  echo "─── Package installation ───"
 
-  if [[ ! -f "$DOTFILES_DIR/Brewfile" ]]; then
-    warn "Brewfile not found. Skipping."
+  # Homebrew available (macOS or Linuxbrew)
+  if command -v brew &>/dev/null; then
+    if [[ ! -f "$DOTFILES_DIR/Brewfile" ]]; then
+      warn "Brewfile not found. Skipping."
+      return
+    fi
+
+    read -rp "[?] Install packages from Brewfile? [y/N] " answer
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      brew bundle --file="$DOTFILES_DIR/Brewfile"
+      info "Brew packages installed"
+    else
+      info "Skipped Brew packages"
+    fi
     return
   fi
 
-  read -rp "[?] Install Homebrew packages from Brewfile? [y/N] " answer
-  if [[ "$answer" =~ ^[Yy]$ ]]; then
-    brew bundle --file="$DOTFILES_DIR/Brewfile"
-    info "Homebrew packages installed"
-  else
-    info "Skipped Homebrew packages"
+  # Linux without Homebrew — use native package manager
+  local pkg_file=""
+  local pkg_cmd=""
+
+  if command -v apt &>/dev/null; then
+    pkg_file="$DOTFILES_DIR/packages.apt"
+    pkg_cmd="sudo apt install -y"
+  elif command -v dnf &>/dev/null; then
+    pkg_file="$DOTFILES_DIR/packages.dnf"
+    pkg_cmd="sudo dnf install -y"
+  elif command -v pacman &>/dev/null; then
+    pkg_file="$DOTFILES_DIR/packages.pacman"
+    pkg_cmd="sudo pacman -S --needed"
   fi
+
+  if [[ -z "$pkg_file" ]]; then
+    warn "No supported package manager found. Install packages manually."
+    return
+  fi
+
+  if [[ ! -f "$pkg_file" ]]; then
+    warn "Package list not found: $pkg_file. Skipping."
+    return
+  fi
+
+  read -rp "[?] Install packages from $(basename "$pkg_file")? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    # Read non-comment, non-empty lines
+    grep -v '^\s*#' "$pkg_file" | grep -v '^\s*$' | xargs $pkg_cmd
+    info "System packages installed"
+  else
+    info "Skipped system packages"
+  fi
+}
+
+# ─── Shell Selection ─────────────────────────────────────
+CHOSEN_SHELL=""
+
+choose_shell() {
+  echo ""
+  echo "─── Shell selection ───"
+
+  if command -v zsh &>/dev/null && command -v bash &>/dev/null; then
+    read -rp "[?] Which shell to configure? [zsh/bash] (default: zsh) " answer
+    case "$answer" in
+      [Bb]ash) CHOSEN_SHELL="bash" ;;
+      *)       CHOSEN_SHELL="zsh" ;;
+    esac
+  elif command -v zsh &>/dev/null; then
+    CHOSEN_SHELL="zsh"
+  else
+    CHOSEN_SHELL="bash"
+  fi
+
+  info "Selected shell: $CHOSEN_SHELL"
 }
 
 # ─── Shell & Plugin Setup ────────────────────────────────
@@ -66,6 +147,22 @@ setup_shell() {
   echo ""
   echo "─── Shell setup ───"
 
+  if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
+    setup_zsh
+  else
+    info "bash requires no extra setup (stow only)"
+  fi
+
+  # tmux TPM (shared)
+  if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    info "tmux TPM installed (run prefix + I inside tmux to install plugins)"
+  else
+    info "tmux TPM (already installed)"
+  fi
+}
+
+setup_zsh() {
   # oh-my-zsh
   if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     read -rp "[?] Install oh-my-zsh? [y/N] " answer
@@ -103,14 +200,6 @@ setup_shell() {
       info "Powerlevel10k (already installed)"
     fi
   fi
-
-  # tmux TPM
-  if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    info "tmux TPM installed (run prefix + I inside tmux to install plugins)"
-  else
-    info "tmux TPM (already installed)"
-  fi
 }
 
 # ─── Backup & Stow ───────────────────────────────────────
@@ -118,12 +207,12 @@ backup_existing() {
   local dest="$1"
   local src="$2"
   if [[ -e "$dest" && ! -L "$dest" ]]; then
-    # 차이가 없으면 백업 없이 제거만
+    # No diff = remove silently
     if diff -q "$dest" "$src" &>/dev/null; then
       rm "$dest"
       return
     fi
-    # 차이가 있으면 diff 표시
+    # Show diff for conflicting files
     echo ""
     warn "Conflict: $dest (existing file differs from dotfiles)"
     echo "─── diff (existing → dotfiles) ───"
@@ -154,8 +243,6 @@ stow_package() {
 }
 
 # ─── Claude Code: Plugins ────────────────────────────────
-# 플러그인은 settings.json의 enabledPlugins + extraKnownMarketplaces로 관리됨
-# Stow로 settings.json이 심링크되면 Claude Code 재시작 시 자동 적용
 setup_claude_plugins() {
   echo ""
   echo "─── Claude Code plugins ───"
@@ -164,8 +251,6 @@ setup_claude_plugins() {
 }
 
 # ─── Claude Code: MCP Servers ────────────────────────────
-# MCP 서버 설정은 ~/.claude.json에 저장됨 (심링크/버전관리 불가)
-# 따라서 CLI 명령어로 등록해야 함
 setup_claude_mcp() {
   if ! command -v claude &>/dev/null; then
     return
@@ -174,8 +259,7 @@ setup_claude_mcp() {
   echo ""
   echo "─── Claude Code MCP servers ───"
 
-  # ── stdio 기반 MCP 서버 ──
-  # 형식: "이름|명령어|인자"
+  # ── stdio MCP servers ──
   local mcp_servers=(
     "playwright|npx|@playwright/mcp@latest"
     "sequential-thinking|npx|-y @modelcontextprotocol/server-sequential-thinking"
@@ -196,8 +280,7 @@ setup_claude_mcp() {
     fi
   done
 
-  # ── HTTP transport 기반 MCP 서버 ──
-  # 형식: "이름|URL"
+  # ── HTTP transport MCP servers ──
   local mcp_http_servers=(
     "context7|https://mcp.context7.com/mcp"
   )
@@ -216,7 +299,7 @@ setup_claude_mcp() {
     fi
   done
 
-  # ── API 키가 필요한 MCP 서버 (안내만 출력) ──
+  # ── API key required (info only) ──
   if ! claude mcp list 2>/dev/null | grep -q "supabase"; then
     echo ""
     warn "MCP: supabase requires an access token."
@@ -231,24 +314,31 @@ setup_claude_mcp() {
 # ─── Main ─────────────────────────────────────────────────
 main() {
   echo "─── dotfiles install ───"
+  echo "  OS: $OS"
   echo ""
 
   check_deps
-  install_brew_packages
+  install_packages
+  choose_shell
   setup_shell
 
   echo ""
   echo "─── Stow packages ───"
 
-  # Stow packages (add new packages here)
-  local packages=(
-    claude
-    zsh
-    tmux
-    nvim
-    karabiner
-    yazi
-  )
+  # Base packages (all platforms)
+  local packages=(claude tmux nvim yazi)
+
+  # Shell package
+  if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
+    packages+=(zsh)
+  else
+    packages+=(bash)
+  fi
+
+  # macOS-only packages
+  if [[ "$OS" == "Darwin" ]]; then
+    packages+=(karabiner)
+  fi
 
   for pkg in "${packages[@]}"; do
     stow_package "$pkg"

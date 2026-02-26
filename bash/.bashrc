@@ -1,21 +1,5 @@
-# ─── Powerlevel10k instant prompt ─────────────────────────
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# ─── Oh My Zsh ───────────────────────────────────────────
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
-
-plugins=(
-  git
-  zsh-syntax-highlighting
-  zsh-autosuggestions
-  fzf
-  asdf
-)
-
-source $ZSH/oh-my-zsh.sh
+# ─── Non-interactive bail out ─────────────────────────────
+[[ $- != *i* ]] && return
 
 # ─── Editor ──────────────────────────────────────────────
 export EDITOR="nvim"
@@ -25,8 +9,13 @@ alias vimdiff="nvim -d"
 
 # ─── Modern CLI tools ───────────────────────────────────
 # bat (cat replacement)
-alias cat="bat"
-export BAT_THEME="tokyonight_night"
+if command -v bat &>/dev/null; then
+  alias cat="bat"
+  export BAT_THEME="tokyonight_night"
+elif command -v batcat &>/dev/null; then
+  alias cat="batcat"
+  export BAT_THEME="tokyonight_night"
+fi
 
 # eza (ls replacement)
 if command -v eza &>/dev/null; then
@@ -37,7 +26,12 @@ fi
 
 # zoxide (cd replacement)
 if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh)"
+  eval "$(zoxide init bash)"
+fi
+
+# fzf
+if command -v fzf &>/dev/null; then
+  eval "$(fzf --bash 2>/dev/null)" || true
 fi
 
 # fzf + fd
@@ -45,14 +39,19 @@ if command -v fd &>/dev/null; then
   export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
+elif command -v fdfind &>/dev/null; then
+  export FZF_DEFAULT_COMMAND="fdfind --hidden --strip-cwd-prefix --exclude .git"
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND="fdfind --type=d --hidden --strip-cwd-prefix --exclude .git"
 fi
 
 # yazi wrapper (cd into dir on exit)
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+y() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
   yazi "$@" --cwd-file="$tmp"
   if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
+    builtin cd -- "$cwd" || return
   fi
   rm -f -- "$tmp"
 }
@@ -89,8 +88,14 @@ esac
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
-# ─── Powerlevel10k ───────────────────────────────────────
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# ─── Prompt (git-aware) ──────────────────────────────────
+__git_branch() {
+  local branch
+  branch="$(git branch --show-current 2>/dev/null)"
+  [[ -n "$branch" ]] && printf " (%s)" "$branch"
+}
+
+PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(__git_branch)\[\033[00m\]\$ '
 
 # ─── Local overrides (not tracked) ──────────────────────
-[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
+[[ -f "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"

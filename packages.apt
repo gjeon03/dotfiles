@@ -1,0 +1,16 @@
+# Debian/Ubuntu packages
+# Usage: xargs -a packages.apt sudo apt install -y
+stow
+neovim
+tmux
+bat
+fd-find
+fzf
+ripgrep
+eza
+zoxide
+yazi
+lazygit
+jq
+gh
+glab

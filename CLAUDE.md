@@ -1,6 +1,6 @@
 # dotfiles
 
-GNU Stow로 관리하는 개인 dotfiles. macOS 기준.
+GNU Stow로 관리하는 개인 dotfiles. macOS + Linux 지원.
 
 전체 구조와 각 설정에 대한 설명은 @README.md 참고.
 
