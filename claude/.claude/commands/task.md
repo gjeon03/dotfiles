@@ -6,11 +6,13 @@
 
 ```
 tasks/
-├── feat-login-bug.md      ← 진행 중 태스크
+├── feat-login-bug.md          ← 진행 중 태스크
 ├── refactor-auth.md
 └── done/
-    ├── 2026-02-25.md      ← 날짜별 완료 기록
-    └── 2026-02-26.md
+    ├── 2026-02-25/
+    │   └── feat-login-bug.md  ← 완료 (상태 변경 + 이동)
+    └── 2026-02-26/
+        └── refactor-auth.md
 ```
 
 ## 태스크 파일 형식 (`tasks/<slug>.md`)
@@ -18,20 +20,12 @@ tasks/
 ```markdown
 # 태스크 제목
 
-- **상태**: 진행 중
+- **상태**: 진행 중 | 완료
 - **생성**: YYYY-MM-DD
+- **완료**: YYYY-MM-DD (완료 시 추가)
 
 ## 내용
 - 작업 설명, 메모, 관련 이슈 등
-```
-
-## 완료 기록 형식 (`tasks/done/YYYY-MM-DD.md`)
-
-```markdown
-# YYYY-MM-DD
-
-- [x] 태스크 제목 — 간단한 완료 요약
-- [x] 다른 태스크 — 요약
 ```
 
 ## 사용법
@@ -45,18 +39,15 @@ tasks/
 ### 태스크 추가: `/task add 로그인 버그 수정`
 - `tasks/login-bug-fix.md` 생성 (slug 자동 변환)
 
-### 태스크 시작: `/task start login-bug-fix`
-- 해당 파일의 상태를 "진행 중"으로 변경
-
 ### 태스크 완료: `/task done login-bug-fix`
-- `tasks/done/YYYY-MM-DD.md`에 완료 항목 추가
-- `tasks/login-bug-fix.md` 삭제
+- 파일 상태를 "완료"로 변경, 완료 날짜 추가
+- `tasks/done/YYYY-MM-DD/login-bug-fix.md`로 이동
 
 ### 목록: `/task list`
 - 진행 중 태스크 전체 표시
 
 ### 완료 기록: `/task history`
-- `tasks/done/` 내 최근 날짜별 완료 기록 표시
+- `tasks/done/` 내 날짜별 디렉토리와 완료된 태스크 표시
 
 ## 절차
 
@@ -69,6 +60,6 @@ tasks/
 
 - 파일명은 케밥 케이스 slug (`feat-login-bug.md`)
 - 날짜는 YYYY-MM-DD 형식
-- `tasks/done/` 디렉토리는 필요할 때 자동 생성
+- `tasks/done/YYYY-MM-DD/` 디렉토리는 필요할 때 자동 생성
 
 $ARGUMENTS
