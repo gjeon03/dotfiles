@@ -133,7 +133,7 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 
 ## Shell 설정
 
-`init.sh` 실행 시 zsh/bash 중 선택. 선택한 쉘만 stow된다.
+`init.sh` 실행 시 zsh/bash 중 선택. 선택한 쉘만 stow된다. 두 쉘 모두 동일한 알리아스와 도구 설정을 공유한다.
 
 ### zsh (기본)
 
@@ -144,9 +144,48 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 ### bash
 
 - 프레임워크 없이 순수 bash 설정
-- git-aware PS1 프롬프트
-- zsh와 동일한 알리아스/도구 설정
+- git-aware PS1 프롬프트 (`user@host:dir (branch)$`)
 - `.bashrc.local`로 머신별 오버라이드
+
+### 공통 알리아스 및 도구 설정
+
+**CLI 도구 대체:**
+
+| 알리아스 | 명령 | 설명 |
+|----------|------|------|
+| `cat` | `bat` | 구문 강조, 테마: `tokyonight_night` |
+| `ls` | `eza --icons` | 파일 타입 아이콘 표시 |
+| `ll` | `eza -la --icons --git` | 상세 목록 + git 상태 |
+| `lt` | `eza --tree --icons --level=2` | 2단계 트리 뷰 |
+| `cd` | `zoxide` | 자주 가는 디렉토리 자동 추론 (`z` 명령) |
+| `y` | `yazi` wrapper | 종료 시 탐색한 디렉토리로 cd |
+
+**fzf + fd 통합:**
+
+| 환경변수 | 값 |
+|----------|-----|
+| `FZF_DEFAULT_COMMAND` | `fd --hidden --strip-cwd-prefix --exclude .git` |
+| `FZF_CTRL_T_COMMAND` | 동일 (파일 검색) |
+| `FZF_ALT_C_COMMAND` | `fd --type=d ...` (디렉토리 검색) |
+
+**에디터:**
+
+| 알리아스 | 명령 |
+|----------|------|
+| `vim`, `vi` | `nvim` |
+| `vimdiff` | `nvim -d` |
+| `EDITOR` | `nvim` |
+
+**안전 알리아스:**
+
+`rm`, `cp`, `mv` — 모두 `-i` (확인 프롬프트) 적용
+
+**Claude Code:**
+
+| 알리아스 | 명령 |
+|----------|------|
+| `cl` | `claude` |
+| `cls` | `claude --dangerously-skip-permissions` |
 
 ---
 
