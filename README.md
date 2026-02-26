@@ -9,18 +9,30 @@ GNU Stow로 관리하는 개인 설정 파일. 새 머신에서 한 번에 환�
 git clone https://github.com/<username>/dotfiles ~/dotfiles
 cd ~/dotfiles
 
-# 2. 설치
+# 2. 설치 (인터랙티브 — 프로필 선택)
 ./init.sh
+
+# 또는 프로필 지정
+./init.sh --system   # 쉘, 패키지, 도구 설정만
+./init.sh --claude   # Claude Code 설정만
+./init.sh --all      # 전체 (프롬프트 없이)
 ```
 
-`init.sh`가 순서대로 수행하는 작업:
+`init.sh`는 두 개의 **프로필**로 나뉜다:
+
+### System 프로필 (`--system`)
 
 1. **Prerequisites** — Stow 확인 (macOS: Homebrew 필수, Linux: apt/dnf/pacman으로 설치)
 2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
 3. **Shell selection** — zsh 또는 bash 선택
 4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
-5. **Stow packages** — 선택된 쉘과 OS에 따라 패키지 심링크
-6. **Claude Code** — 플러그인 안내, MCP 서버 등록
+5. **Stow packages** — tmux, nvim, yazi, 선택된 쉘, karabiner (macOS)
+
+### Claude Code 프로필 (`--claude`)
+
+1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, commands/)
+2. **Plugins** — settings.json으로 관리 (재시작 시 적용)
+3. **MCP servers** — CLI로 등록 (Playwright, Sequential Thinking, Memory, Context7)
 
 ## Structure
 
