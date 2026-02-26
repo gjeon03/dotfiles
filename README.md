@@ -133,7 +133,7 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 
 ## Shell 설정
 
-`init.sh` 실행 시 zsh/bash 중 선택. 선택한 쉘만 stow된다. 두 쉘 모두 동일한 알리아스와 도구 설정을 공유한다.
+`init.sh` 실행 시 zsh/bash 중 선택. 선택한 쉘만 stow된다. 두 쉘 모두 동일한 alias와 도구 설정을 공유한다.
 
 ### zsh (기본)
 
@@ -147,12 +147,12 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 - git-aware PS1 프롬프트 (`user@host:dir (branch)$`)
 - `.bashrc.local`로 머신별 오버라이드
 
-### 공통 알리아스 및 도구 설정
+### 공통 alias 및 도구 설정
 
 **CLI 도구 대체:**
 
-| 알리아스 | 명령 | 설명 |
-|----------|------|------|
+| Alias | 명령 | 설명 |
+|-------|------|------|
 | `cat` | `bat` | 구문 강조, 테마: `tokyonight_night` |
 | `ls` | `eza --icons` | 파일 타입 아이콘 표시 |
 | `ll` | `eza -la --icons --git` | 상세 목록 + git 상태 |
@@ -170,13 +170,13 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 
 **에디터:**
 
-| 알리아스 | 명령 |
-|----------|------|
+| Alias | 명령 |
+|-------|------|
 | `vim`, `vi` | `nvim` |
 | `vimdiff` | `nvim -d` |
 | `EDITOR` | `nvim` |
 
-**안전 알리아스:**
+**Safety alias:**
 
 `rm`, `cp`, `mv` — 모두 `-i` (확인 프롬프트) 적용
 
