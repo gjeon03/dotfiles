@@ -311,6 +311,38 @@ setup_claude_mcp() {
   fi
 }
 
+# ─── Git Local Config ────────────────────────────────────
+setup_gitconfig_local() {
+  if [[ -f "$HOME/.gitconfig.local" ]]; then
+    info "Git user config (already exists: ~/.gitconfig.local)"
+    return
+  fi
+
+  echo ""
+  read -rp "[?] Set up git user config (~/.gitconfig.local)? [y/N] " answer
+  if [[ ! "$answer" =~ ^[Yy]$ ]]; then
+    warn "Skipped. Create ~/.gitconfig.local manually later:"
+    warn '  git config --file ~/.gitconfig.local user.name "Your Name"'
+    warn '  git config --file ~/.gitconfig.local user.email "you@example.com"'
+    return
+  fi
+
+  read -rp "  user.name: " git_name
+  read -rp "  user.email: " git_email
+
+  if [[ -z "$git_name" || -z "$git_email" ]]; then
+    warn "Skipped (empty input)"
+    return
+  fi
+
+  cat > "$HOME/.gitconfig.local" <<EOF
+[user]
+    name = $git_name
+    email = $git_email
+EOF
+  info "Git user config saved to ~/.gitconfig.local"
+}
+
 # ─── Profile: System ─────────────────────────────────────
 run_system() {
   install_packages
@@ -335,6 +367,9 @@ run_system() {
   for pkg in "${packages[@]}"; do
     stow_package "$pkg"
   done
+
+  # git user config
+  setup_gitconfig_local
 }
 
 # ─── Profile: Claude Code ───────────────────────────────
