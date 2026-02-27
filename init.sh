@@ -320,7 +320,7 @@ run_system() {
   echo ""
   echo "─── Stow packages (system) ───"
 
-  local packages=(tmux nvim yazi)
+  local packages=(git tmux nvim yazi)
 
   if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
     packages+=(zsh)

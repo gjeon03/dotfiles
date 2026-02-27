@@ -46,6 +46,9 @@ dotfiles/
 ├── bash/                          # Bash 쉘 설정
 │   ├── .bashrc                    # → ~/.bashrc
 │   └── .bash_profile              # → ~/.bash_profile
+├── git/                           # Git 설정
+│   ├── .gitconfig                 # → ~/.gitconfig
+│   └── .gitignore_global          # → ~/.gitignore_global
 ├── tmux/                          # tmux 설정
 │   └── .tmux.conf                 # → ~/.tmux.conf
 ├── nvim/                          # Neovim 설정
@@ -85,7 +88,46 @@ dotfiles/
 └── .gitignore
 ```
 
-향후 추가 예정: `git/` 등.
+## Git 설정
+
+### .gitconfig
+
+`~/.gitconfig.local`에 `user.name`, `email`을 넣고 `[include]`로 포함하는 구조. 공통 설정만 dotfiles에서 관리.
+
+| 설정 | 값 | 효과 |
+|------|-----|------|
+| `push.default` | `current` | `git push`만으로 현재 브랜치 push |
+| `pull.rebase` | `true` | pull 시 merge commit 대신 rebase |
+| `fetch.prune` | `true` | fetch 시 삭제된 remote 브랜치 자동 정리 |
+| `merge.conflictstyle` | `zdiff3` | conflict에 원본도 표시 (해결 쉬움) |
+| `rebase.autoStash` | `true` | rebase 전 자동 stash → 완료 후 복원 |
+| `rerere.enabled` | `true` | 같은 conflict 재발생 시 이전 해결 자동 적용 |
+| `diff.algorithm` | `histogram` | 기본 myers보다 정확한 diff |
+| `branch.sort` | `-committerdate` | `git branch` 목록을 최근 사용 순 정렬 |
+| `init.defaultBranch` | `main` | 새 repo 기본 브랜치 |
+
+### .gitignore_global
+
+`.DS_Store`, `.env`, `node_modules/`, `.idea/` 등 매 프로젝트마다 반복되는 패턴을 글로벌로 무시.
+
+### oh-my-zsh git plugin
+
+zsh 패키지에서 oh-my-zsh `git` 플러그인이 활성화되어 있어 150개 이상의 git alias를 제공한다. 자주 쓰는 것들:
+
+| Alias | 명령 |
+|-------|------|
+| `gst` | `git status` |
+| `ga` | `git add` |
+| `gcmsg` | `git commit -m` |
+| `gp` | `git push` |
+| `gl` | `git pull` |
+| `gco` | `git checkout` |
+| `gsw` | `git switch` |
+| `gb` | `git branch` |
+| `glog` | `git log --oneline --graph --decorate` |
+| `gd` | `git diff` |
+
+> 전체 목록: https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git
 
 ## Packages
 

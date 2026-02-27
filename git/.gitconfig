@@ -1,0 +1,38 @@
+# ─── Include local config (user.name, email) ─────────────
+[include]
+    path = ~/.gitconfig.local
+
+# ─── Core ─────────────────────────────────────────────────
+[init]
+    defaultBranch = main
+
+[core]
+    excludesfile = ~/.gitignore_global
+
+# ─── Push / Pull / Fetch ─────────────────────────────────
+[push]
+    default = current
+
+[pull]
+    rebase = true
+
+[fetch]
+    prune = true
+
+# ─── Merge / Rebase ──────────────────────────────────────
+[merge]
+    conflictstyle = zdiff3
+
+[rebase]
+    autoStash = true
+
+[rerere]
+    enabled = true
+
+# ─── Diff ─────────────────────────────────────────────────
+[diff]
+    algorithm = histogram
+
+# ─── Branch ───────────────────────────────────────────────
+[branch]
+    sort = -committerdate
