@@ -155,8 +155,11 @@ setup_shell() {
 
   # tmux TPM (shared)
   if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    info "tmux TPM installed (run prefix + I inside tmux to install plugins)"
+    if git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" 2>/dev/null; then
+      info "tmux TPM installed (run prefix + I inside tmux to install plugins)"
+    else
+      warn "tmux TPM failed to install (check network)"
+    fi
   else
     info "tmux TPM (already installed)"
   fi
@@ -167,8 +170,11 @@ setup_zsh() {
   if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     read -rp "[?] Install oh-my-zsh? [y/N] " answer
     if [[ "$answer" =~ ^[Yy]$ ]]; then
-      RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-      info "oh-my-zsh installed"
+      if RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; then
+        info "oh-my-zsh installed"
+      else
+        warn "oh-my-zsh failed to install (check network)"
+      fi
     fi
   else
     info "oh-my-zsh (already installed)"
@@ -179,23 +185,32 @@ setup_zsh() {
 
   if [[ -d "$HOME/.oh-my-zsh" ]]; then
     if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]]; then
-      git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-      info "zsh-syntax-highlighting installed"
+      if git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" 2>/dev/null; then
+        info "zsh-syntax-highlighting installed"
+      else
+        warn "zsh-syntax-highlighting failed to install (check network)"
+      fi
     else
       info "zsh-syntax-highlighting (already installed)"
     fi
 
     if [[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]]; then
-      git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-      info "zsh-autosuggestions installed"
+      if git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null; then
+        info "zsh-autosuggestions installed"
+      else
+        warn "zsh-autosuggestions failed to install (check network)"
+      fi
     else
       info "zsh-autosuggestions (already installed)"
     fi
 
     # Powerlevel10k theme
     if [[ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]]; then
-      git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
-      info "Powerlevel10k installed"
+      if git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k" 2>/dev/null; then
+        info "Powerlevel10k installed"
+      else
+        warn "Powerlevel10k failed to install (check network)"
+      fi
     else
       info "Powerlevel10k (already installed)"
     fi
