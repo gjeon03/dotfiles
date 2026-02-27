@@ -25,7 +25,11 @@ alias vimdiff="nvim -d"
 
 # ─── Modern CLI tools ───────────────────────────────────
 # bat (cat replacement)
-alias cat="bat"
+if command -v bat &>/dev/null; then
+  alias cat="bat"
+elif command -v batcat &>/dev/null; then
+  alias cat="batcat"
+fi
 export BAT_THEME="tokyonight_night"
 
 # eza (ls replacement)
