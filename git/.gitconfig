@@ -8,6 +8,16 @@
 
 [core]
     excludesfile = ~/.gitignore_global
+    pager = delta
+
+# ─── Delta (diff pager) ─────────────────────────────────
+[delta]
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+
+[interactive]
+    diffFilter = delta --color-only
 
 # ─── Push / Pull / Fetch ─────────────────────────────────
 [push]
@@ -32,6 +42,7 @@
 # ─── Diff ─────────────────────────────────────────────────
 [diff]
     algorithm = histogram
+    colorMoved = default
 
 # ─── Branch ───────────────────────────────────────────────
 [branch]

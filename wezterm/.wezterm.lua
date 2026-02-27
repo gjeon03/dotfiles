@@ -4,7 +4,10 @@ local config = wezterm.config_builder()
 local is_darwin = wezterm.target_triple:find("darwin") ~= nil
 
 -- ─── Font ──────────────────────────────────────────────
-config.font = wezterm.font("JetBrainsMono Nerd Font Mono")
+config.font = wezterm.font_with_fallback({
+	"JetBrainsMono Nerd Font Mono",
+	"JetBrains Mono",
+})
 config.font_size = 13
 
 -- ─── Window ────────────────────────────────────────────

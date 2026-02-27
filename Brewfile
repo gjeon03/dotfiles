@@ -14,6 +14,7 @@ brew "jq"             # JSON processor
 brew "gh"             # GitHub CLI
 brew "glab"           # GitLab CLI
 brew "asdf"           # Version manager
+brew "git-delta"      # Git diff pager
 
 # ─── macOS only ──────────────────────────────────────────
 if OS.mac?

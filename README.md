@@ -105,8 +105,10 @@ dotfiles/
 | `rebase.autoStash` | `true` | rebase 전 자동 stash → 완료 후 복원 |
 | `rerere.enabled` | `true` | 같은 conflict 재발생 시 이전 해결 자동 적용 |
 | `diff.algorithm` | `histogram` | 기본 myers보다 정확한 diff |
+| `diff.colorMoved` | `default` | 이동된 코드 블록 색상 구분 |
 | `branch.sort` | `-committerdate` | `git branch` 목록을 최근 사용 순 정렬 |
 | `init.defaultBranch` | `main` | 새 repo 기본 브랜치 |
+| `core.pager` | `delta` | 구문 강조 diff pager (side-by-side, 줄번호) |
 
 ### .gitignore_global
 
@@ -219,6 +221,7 @@ prefix 키가 `Ctrl+b`(기본)에서 `Ctrl+a`로 변경되어 있다. 모든 tmu
 | `gh` | GitHub CLI |
 | `glab` | GitLab CLI |
 | `asdf` | 런타임 버전 매니저 |
+| `git-delta` | Git diff pager (구문 강조, side-by-side) |
 
 **macOS 전용 (cask):**
 
