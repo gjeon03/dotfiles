@@ -137,12 +137,14 @@ GPU 가속 터미널 에뮬레이터. Lua로 설정한다.
 
 | 설정 | 값 | 설명 |
 |------|-----|------|
-| `font_size` | `13` | 폰트 크기 |
+| 폰트 | JetBrainsMono Nerd Font Mono, 13pt | Brewfile에서 설치 |
 | `window_decorations` | `RESIZE` | 타이틀바 숨김, 리사이즈만 가능 |
 | `window_background_opacity` | `0.75` | 배경 반투명 (75%) |
-| `macos_window_background_blur` | `20` | macOS 배경 블러 효과 |
-| `enable_tab_bar` | `false` | 탭바 비활성화 (tmux 사용) |
-| 컬러 테마 | coolnight | 커스텀 다크 테마 (하드코딩) |
+| `macos_window_background_blur` | `20` | macOS 전용 블러 효과 |
+| `window_padding` | `12px` | 상하좌우 여백 |
+| 탭바 | 하단, 레트로 스타일 | 탭 1개일 때 자동 숨김 |
+| `scrollback_lines` | `10000` | 스크롤백 버퍼 (기본 3500) |
+| 컬러 테마 | Tokyo Night | tmux 테마와 통일 |
 
 ## tmux 설정
 

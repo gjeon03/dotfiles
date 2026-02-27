@@ -1,27 +1,35 @@
 local wezterm = require("wezterm")
 
 local config = wezterm.config_builder()
+local is_darwin = wezterm.target_triple:find("darwin") ~= nil
 
 -- ─── Font ──────────────────────────────────────────────
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono")
 config.font_size = 13
 
 -- ─── Window ────────────────────────────────────────────
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.75
-config.macos_window_background_blur = 20
-config.enable_tab_bar = false
-
--- ─── Colors (coolnight) ────────────────────────────────
-config.colors = {
-	foreground = "#CBE0F0",
-	background = "#011423",
-	cursor_bg = "#47FF9C",
-	cursor_border = "#47FF9C",
-	cursor_fg = "#011423",
-	selection_bg = "#033259",
-	selection_fg = "#CBE0F0",
-	ansi = { "#214969", "#E52E2E", "#44FFB1", "#FFE073", "#0FC5ED", "#a277ff", "#24EAF7", "#24EAF7" },
-	brights = { "#214969", "#E52E2E", "#44FFB1", "#FFE073", "#A277FF", "#a277ff", "#24EAF7", "#24EAF7" },
+config.window_padding = {
+	left = 12,
+	right = 12,
+	top = 12,
+	bottom = 12,
 }
+
+if is_darwin then
+	config.macos_window_background_blur = 20
+end
+
+-- ─── Tab bar ───────────────────────────────────────────
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
+config.hide_tab_bar_if_only_one_tab = true
+
+-- ─── Scrollback ────────────────────────────────────────
+config.scrollback_lines = 10000
+
+-- ─── Colors (Tokyo Night) ──────────────────────────────
+config.color_scheme = "Tokyo Night"
 
 return config
