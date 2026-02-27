@@ -26,7 +26,7 @@ cd ~/dotfiles
 2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
 3. **Shell selection** — zsh 또는 bash 선택
 4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
-5. **Stow packages** — tmux, nvim, yazi, 선택된 쉘, karabiner (macOS)
+5. **Stow packages** — tmux, nvim, yazi, wezterm, 선택된 쉘, karabiner (macOS)
 
 ### Claude Code 프로필 (`--claude`)
 
@@ -57,6 +57,8 @@ dotfiles/
 │       └── lua/user/              # plugins, core, lsp
 ├── karabiner/                     # Karabiner-Elements 키보드 설정 (macOS only)
 │   └── .config/karabiner/         # → ~/.config/karabiner/
+├── wezterm/                       # WezTerm 터미널 설정
+│   └── .wezterm.lua               # → ~/.wezterm.lua
 ├── yazi/                          # Yazi 파일 매니저 설정
 │   └── .config/yazi/              # → ~/.config/yazi/
 ├── claude/                        # Claude Code 설정
@@ -128,6 +130,19 @@ zsh 패키지에서 oh-my-zsh `git` 플러그인이 활성화되어 있어 150�
 | `gd` | `git diff` |
 
 > 전체 목록: https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git
+
+## WezTerm 설정
+
+GPU 가속 터미널 에뮬레이터. Lua로 설정한다.
+
+| 설정 | 값 | 설명 |
+|------|-----|------|
+| `font_size` | `13` | 폰트 크기 |
+| `window_decorations` | `RESIZE` | 타이틀바 숨김, 리사이즈만 가능 |
+| `window_background_opacity` | `0.75` | 배경 반투명 (75%) |
+| `macos_window_background_blur` | `20` | macOS 배경 블러 효과 |
+| `enable_tab_bar` | `false` | 탭바 비활성화 (tmux 사용) |
+| 컬러 테마 | coolnight | 커스텀 다크 테마 (하드코딩) |
 
 ## tmux 설정
 
