@@ -11,6 +11,9 @@
 # Karabiner auto-generated
 karabiner/automatic_backups/
 
+# Playwright MCP
+.playwright-mcp/
+
 # Secrets
 .env
 *.pem
