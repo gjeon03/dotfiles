@@ -112,11 +112,114 @@ install_packages() {
 
   read -rp "[?] Install packages from $(basename "$pkg_file")? [y/N] " answer
   if [[ "$answer" =~ ^[Yy]$ ]]; then
-    # Read non-comment, non-empty lines
-    grep -v '^\s*#' "$pkg_file" | grep -v '^\s*$' | xargs $pkg_cmd
+    # Install packages one by one so individual failures don't block the rest
+    local failed=()
+    while IFS= read -r pkg; do
+      if ! $pkg_cmd "$pkg" 2>/dev/null; then
+        failed+=("$pkg")
+      fi
+    done < <(grep -v '^\s*#' "$pkg_file" | grep -v '^\s*$')
+
+    if [[ ${#failed[@]} -gt 0 ]]; then
+      warn "Failed to install: ${failed[*]}"
+    fi
     info "System packages installed"
   else
     info "Skipped system packages"
+  fi
+
+  # Tools not in standard repos — install from GitHub releases
+  install_github_tools
+}
+
+# ─── GitHub Release Tools (Linux only) ───────────────────
+install_github_tools() {
+  # Homebrew handles everything; only needed for native pkg manager installs
+  if command -v brew &>/dev/null; then
+    return
+  fi
+
+  local arch
+  arch="$(uname -m)"
+
+  # ── lazygit ──
+  if ! command -v lazygit &>/dev/null; then
+    local lg_arch
+    case "$arch" in
+      x86_64)  lg_arch="x86_64" ;;
+      aarch64) lg_arch="arm64" ;;
+      *)       lg_arch="" ;;
+    esac
+
+    if [[ -n "$lg_arch" ]]; then
+      local lg_version
+      lg_version=$(curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" \
+        | grep -Po '"tag_name":\s*"v\K[^"]*' 2>/dev/null) || true
+
+      if [[ -n "$lg_version" ]]; then
+        local tmp_dir
+        tmp_dir=$(mktemp -d)
+        if curl -fsSL "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${lg_version}_Linux_${lg_arch}.tar.gz" \
+          | tar xz -C "$tmp_dir" lazygit 2>/dev/null; then
+          sudo install "$tmp_dir/lazygit" /usr/local/bin/lazygit
+          info "lazygit $lg_version installed (GitHub release)"
+        else
+          warn "lazygit: failed to download (check network)"
+        fi
+        rm -rf "$tmp_dir"
+      else
+        warn "lazygit: failed to fetch latest version"
+      fi
+    else
+      warn "lazygit: unsupported architecture $arch"
+    fi
+  else
+    info "lazygit (already installed)"
+  fi
+
+  # ── yazi ──
+  if ! command -v yazi &>/dev/null; then
+    local yz_arch
+    case "$arch" in
+      x86_64)  yz_arch="x86_64" ;;
+      aarch64) yz_arch="aarch64" ;;
+      *)       yz_arch="" ;;
+    esac
+
+    if [[ -n "$yz_arch" ]]; then
+      # yazi release is a .zip — ensure unzip is available
+      if ! command -v unzip &>/dev/null; then
+        if command -v apt &>/dev/null; then
+          sudo apt install -y unzip 2>/dev/null
+        elif command -v dnf &>/dev/null; then
+          sudo dnf install -y unzip 2>/dev/null
+        fi
+      fi
+      if ! command -v unzip &>/dev/null; then
+        warn "yazi: unzip not found, skipping"
+        return
+      fi
+
+      local tmp_dir
+      tmp_dir=$(mktemp -d)
+      if curl -fsSL -o "$tmp_dir/yazi.zip" \
+        "https://github.com/sxyazi/yazi/releases/latest/download/yazi-${yz_arch}-unknown-linux-gnu.zip" 2>/dev/null \
+        && unzip -q "$tmp_dir/yazi.zip" -d "$tmp_dir" 2>/dev/null; then
+        sudo install "$tmp_dir"/yazi-*/yazi /usr/local/bin/yazi
+        # ya (yazi helper)
+        if compgen -G "$tmp_dir"/yazi-*/ya >/dev/null 2>&1; then
+          sudo install "$tmp_dir"/yazi-*/ya /usr/local/bin/ya
+        fi
+        info "yazi installed (GitHub release)"
+      else
+        warn "yazi: failed to download (check network)"
+      fi
+      rm -rf "$tmp_dir"
+    else
+      warn "yazi: unsupported architecture $arch"
+    fi
+  else
+    info "yazi (already installed)"
   fi
 }
 
