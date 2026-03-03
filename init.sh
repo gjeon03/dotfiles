@@ -461,6 +461,17 @@ EOF
   info "Git user config saved to ~/.gitconfig.local"
 }
 
+# ─── iTerm2 Setup (macOS only) ───────────────────────────
+setup_iterm2() {
+  if ! command -v defaults &>/dev/null; then
+    return
+  fi
+
+  # Set dynamic profile as default for new windows/tabs
+  defaults write com.googlecode.iterm2 "Default Bookmark Guid" -string "dotfiles-tokyo-night"
+  info "iTerm2: dotfiles profile set as default"
+}
+
 # ─── Profile: System ─────────────────────────────────────
 run_system() {
   install_packages
@@ -470,7 +481,7 @@ run_system() {
   echo ""
   echo "─── Stow packages (system) ───"
 
-  local packages=(git tmux nvim yazi wezterm)
+  local packages=(git tmux nvim yazi)
 
   if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
     packages+=(zsh)
@@ -479,12 +490,17 @@ run_system() {
   fi
 
   if [[ "$OS" == "Darwin" ]]; then
-    packages+=(karabiner)
+    packages+=(karabiner wezterm iterm2)
   fi
 
   for pkg in "${packages[@]}"; do
     stow_package "$pkg"
   done
+
+  # macOS app settings
+  if [[ "$OS" == "Darwin" ]]; then
+    setup_iterm2
+  fi
 
   # git user config
   setup_gitconfig_local

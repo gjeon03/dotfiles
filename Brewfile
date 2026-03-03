@@ -21,4 +21,5 @@ if OS.mac?
   cask "font-jetbrains-mono-nerd-font"
   cask "karabiner-elements"
   cask "wezterm"
+  cask "iterm2"
 end
