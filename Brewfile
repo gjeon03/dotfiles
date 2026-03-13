@@ -15,6 +15,7 @@ brew "gh"             # GitHub CLI
 brew "glab"           # GitLab CLI
 brew "asdf"           # Version manager
 brew "git-delta"      # Git diff pager
+brew "cloudflared"    # Cloudflare Tunnel client
 
 # ─── macOS only ──────────────────────────────────────────
 if OS.mac?

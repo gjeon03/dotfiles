@@ -177,6 +177,30 @@ install_github_tools() {
     info "lazygit (already installed)"
   fi
 
+  # ── cloudflared ──
+  if ! command -v cloudflared &>/dev/null; then
+    local cf_arch
+    case "$arch" in
+      x86_64)  cf_arch="amd64" ;;
+      aarch64) cf_arch="arm64" ;;
+      *)       cf_arch="" ;;
+    esac
+
+    if [[ -n "$cf_arch" ]]; then
+      if curl -fsSL -o /tmp/cloudflared "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${cf_arch}" 2>/dev/null; then
+        sudo install /tmp/cloudflared /usr/local/bin/cloudflared
+        rm -f /tmp/cloudflared
+        info "cloudflared installed (GitHub release)"
+      else
+        warn "cloudflared: failed to download (check network)"
+      fi
+    else
+      warn "cloudflared: unsupported architecture $arch"
+    fi
+  else
+    info "cloudflared (already installed)"
+  fi
+
   # ── yazi ──
   if ! command -v yazi &>/dev/null; then
     local yz_arch
