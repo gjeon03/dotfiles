@@ -392,6 +392,42 @@ setup_claude_plugins() {
   info "  Enabled: oh-my-claudecode, context7, security-guidance, frontend-design, playwright"
 }
 
+# ─── Claude Code: Skills (npx skills) ────────────────────
+setup_claude_skills() {
+  if ! command -v npx &>/dev/null; then
+    warn "npx not found. Skipping skills installation."
+    return
+  fi
+
+  echo ""
+  echo "─── Claude Code skills ───"
+
+  local lock_file="$HOME/.agents/.skill-lock.json"
+
+  # source → skill names to check (first match = already installed)
+  local skills=(
+    "vercel-labs/skills|find-skills"
+    "vercel-labs/agent-skills|react-best-practices"
+    "obra/superpowers|systematic-debugging"
+    "anthropics/skills|pdf"
+  )
+
+  for entry in "${skills[@]}"; do
+    IFS='|' read -r source check_skill <<< "$entry"
+
+    # Check if any skill from this source is already installed
+    if [[ -f "$lock_file" ]] && grep -q "\"$source\"" "$lock_file" 2>/dev/null; then
+      info "Skill: $source (already installed)"
+    else
+      if npx -y skills add "$source" 2>/dev/null; then
+        info "Skill: $source (installed)"
+      else
+        warn "Skill: $source (failed — run manually: npx skills add $source)"
+      fi
+    fi
+  done
+}
+
 # ─── Claude Code: MCP Servers ────────────────────────────
 setup_claude_mcp() {
   if ! command -v claude &>/dev/null; then
@@ -537,6 +573,7 @@ run_claude() {
   stow_package claude
 
   setup_claude_plugins
+  setup_claude_skills
   setup_claude_mcp
 }
 
