@@ -404,25 +404,32 @@ setup_claude_skills() {
 
   local lock_file="$HOME/.agents/.skill-lock.json"
 
-  # source → skill names to check (first match = already installed)
+  # "source|skill1 skill2 ..." — install specific skills from each repo
   local skills=(
     "vercel-labs/skills|find-skills"
-    "vercel-labs/agent-skills|react-best-practices"
-    "obra/superpowers|systematic-debugging"
+    "vercel-labs/agent-skills|vercel-react-best-practices vercel-composition-patterns web-design-guidelines"
+    "obra/superpowers|systematic-debugging brainstorming"
     "anthropics/skills|pdf"
   )
 
   for entry in "${skills[@]}"; do
-    IFS='|' read -r source check_skill <<< "$entry"
+    IFS='|' read -r source skill_names <<< "$entry"
 
-    # Check if any skill from this source is already installed
-    if [[ -f "$lock_file" ]] && grep -q "\"$source\"" "$lock_file" 2>/dev/null; then
+    local all_installed=true
+    for s in $skill_names; do
+      if [[ ! -d "$HOME/.agents/skills/$s" ]]; then
+        all_installed=false
+        break
+      fi
+    done
+
+    if $all_installed; then
       info "Skill: $source (already installed)"
     else
-      if npx -y skills add "$source" -g --all 2>/dev/null; then
-        info "Skill: $source (installed)"
+      if npx -y skills add "$source" -g --skill $skill_names -y 2>/dev/null; then
+        info "Skill: $source (installed: $skill_names)"
       else
-        warn "Skill: $source (failed — run manually: npx skills add $source)"
+        warn "Skill: $source (failed — run manually: npx skills add $source -g --skill $skill_names -y)"
       fi
     fi
   done
