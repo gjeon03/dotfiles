@@ -419,7 +419,7 @@ setup_claude_skills() {
     if [[ -f "$lock_file" ]] && grep -q "\"$source\"" "$lock_file" 2>/dev/null; then
       info "Skill: $source (already installed)"
     else
-      if npx -y skills add "$source" 2>/dev/null; then
+      if npx -y skills add "$source" -g --all 2>/dev/null; then
         info "Skill: $source (installed)"
       else
         warn "Skill: $source (failed — run manually: npx skills add $source)"
