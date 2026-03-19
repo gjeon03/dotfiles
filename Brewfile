@@ -17,10 +17,13 @@ brew "asdf"           # Version manager
 brew "git-delta"      # Git diff pager
 brew "cloudflared"    # Cloudflare Tunnel client
 
+tap "manaflow-ai/cmux"
+
 # ─── macOS only ──────────────────────────────────────────
 if OS.mac?
   cask "font-jetbrains-mono-nerd-font"
   cask "karabiner-elements"
   cask "wezterm"
   cask "iterm2"
+  cask "cmux"           # Claude tmux session manager
 end
