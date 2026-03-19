@@ -61,6 +61,12 @@ alias rm="rm -i"
 alias cp="cp -i"
 alias mv="mv -i"
 
+# ─── tmux ───────────────────────────────────────────────
+alias tn="tmux new -s"
+alias ta="tmux attach -t"
+alias tl="tmux ls"
+alias tk="tmux kill-session -t"
+
 # ─── Claude Code ─────────────────────────────────────────
 alias cl="claude"
 alias cls="claude --dangerously-skip-permissions"

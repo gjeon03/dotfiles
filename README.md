@@ -26,7 +26,7 @@ cd ~/dotfiles
 2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
 3. **Shell selection** — zsh 또는 bash 선택
 4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
-5. **Stow packages** — tmux, nvim, yazi, wezterm, 선택된 쉘, karabiner (macOS)
+5. **Stow packages** — tmux, nvim, yazi, wezterm, ghostty, 선택된 쉘, karabiner (macOS)
 
 ### Claude Code 프로필 (`--claude`)
 
@@ -61,6 +61,9 @@ dotfiles/
 │   └── .wezterm.lua               # → ~/.wezterm.lua
 ├── yazi/                          # Yazi 파일 매니저 설정
 │   └── .config/yazi/              # → ~/.config/yazi/
+├── ghostty/                       # Ghostty 터미널 설정
+│   └── .config/ghostty/           # → ~/.config/ghostty/
+│       └── config
 ├── claude/                        # Claude Code 설정
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md

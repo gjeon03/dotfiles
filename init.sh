@@ -557,7 +557,7 @@ run_system() {
   fi
 
   if [[ "$OS" == "Darwin" ]]; then
-    packages+=(karabiner wezterm iterm2)
+    packages+=(karabiner wezterm iterm2 ghostty)
   fi
 
   for pkg in "${packages[@]}"; do
