@@ -26,7 +26,8 @@ cd ~/dotfiles
 2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
 3. **Shell selection** — zsh 또는 bash 선택
 4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
-5. **Stow packages** — tmux, nvim, yazi, wezterm, ghostty, 선택된 쉘, karabiner (macOS)
+5. **Stow packages** — git, tmux, nvim, yazi, 선택된 쉘 + macOS에서 karabiner, wezterm, iterm2, ghostty
+6. **iTerm2 프로필** — 동적 프로필(`dotfiles-tokyo-night`)을 기본값으로 지정 (macOS)
 
 ### Claude Code 프로필 (`--claude`)
 
@@ -66,6 +67,9 @@ dotfiles/
 ├── ghostty/                       # Ghostty 터미널 설정
 │   └── .config/ghostty/           # → ~/.config/ghostty/
 │       └── config
+├── iterm2/                        # iTerm2 동적 프로필 (macOS only)
+│   └── Library/Application Support/iTerm2/DynamicProfiles/
+│       └── dotfiles.json          # Tokyo Night 프로필
 ├── claude/                        # Claude Code 설정
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
@@ -228,6 +232,7 @@ prefix 키가 `Ctrl+b`(기본)에서 `Ctrl+a`로 변경되어 있다. 모든 tmu
 | `glab` | GitLab CLI |
 | `asdf` | 런타임 버전 매니저 |
 | `git-delta` | Git diff pager (구문 강조, side-by-side) |
+| `cloudflared` | Cloudflare Tunnel 클라이언트 |
 
 **macOS 전용 (cask):**
 
@@ -236,6 +241,8 @@ prefix 키가 `Ctrl+b`(기본)에서 `Ctrl+a`로 변경되어 있다. 모든 tmu
 | `font-jetbrains-mono-nerd-font` | Nerd Font 패치 개발 폰트 |
 | `karabiner-elements` | 키보드 커스터마이징 |
 | `wezterm` | GPU 가속 터미널 |
+| `iterm2` | 터미널 에뮬레이터 |
+| `cmux` | Claude Code tmux 세션 매니저 (`manaflow-ai/cmux` tap) |
 
 ### Linux 패키지 파일
 
