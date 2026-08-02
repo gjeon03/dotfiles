@@ -389,7 +389,35 @@ setup_claude_plugins() {
   echo ""
   echo "─── Claude Code plugins ───"
   info "Plugins are managed via settings.json (applied on Claude Code restart)"
-  info "  Enabled: oh-my-claudecode, context7, security-guidance, frontend-design, playwright"
+  info "  Enabled: oh-my-claudecode, codex, context7, security-guidance, frontend-design, playwright"
+}
+
+# ─── Claude Code: Status line ────────────────────────────
+setup_claude_statusline() {
+  echo ""
+  echo "─── Claude Code status line ───"
+
+  if command -v ccstatusline &>/dev/null; then
+    info "ccstatusline (already installed)"
+    return
+  fi
+
+  # statusline.sh는 ccstatusline이 없으면 내장 fallback으로 동작한다.
+  if ! command -v npm &>/dev/null; then
+    warn "npm not found — statusline falls back to the built-in renderer"
+    return
+  fi
+
+  read -rp "[?] Install ccstatusline (rich status line)? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    if npm install -g ccstatusline; then
+      info "ccstatusline installed"
+    else
+      warn "ccstatusline install failed — falling back to the built-in renderer"
+    fi
+  else
+    info "Skipped — using the built-in fallback renderer"
+  fi
 }
 
 # ─── Claude Code: Skills (npx skills) ────────────────────
@@ -405,11 +433,12 @@ setup_claude_skills() {
   local lock_file="$HOME/.agents/.skill-lock.json"
 
   # "source|skill1 skill2 ..." — install specific skills from each repo
+  # 공개 소스만 관리한다. 사내/로컬 프로젝트 repo에서 심링크된 skill은 대상이 아니다.
   local skills=(
     "vercel-labs/skills|find-skills"
     "vercel-labs/agent-skills|vercel-react-best-practices vercel-composition-patterns web-design-guidelines"
-    "obra/superpowers|systematic-debugging brainstorming"
-    "anthropics/skills|pdf"
+    "obra/superpowers|systematic-debugging brainstorming writing-plans subagent-driven-development using-git-worktrees requesting-code-review finishing-a-development-branch"
+    "anthropics/skills|pdf docx xlsx skill-creator"
   )
 
   for entry in "${skills[@]}"; do
@@ -445,10 +474,9 @@ setup_claude_mcp() {
   echo "─── Claude Code MCP servers ───"
 
   # ── stdio MCP servers ──
+  # 사내/로컬 프로젝트에 묶인 서버(purple-hub, planning-hub)는 대상이 아니다.
   local mcp_servers=(
     "playwright|npx|@playwright/mcp@latest"
-    "sequential-thinking|npx|-y @modelcontextprotocol/server-sequential-thinking"
-    "memory|npx|-y @modelcontextprotocol/server-memory"
   )
 
   for entry in "${mcp_servers[@]}"; do
@@ -484,15 +512,21 @@ setup_claude_mcp() {
     fi
   done
 
-  # ── API key required (info only) ──
-  if ! claude mcp list 2>/dev/null | grep -q "supabase"; then
-    echo ""
-    warn "MCP: supabase requires an access token."
-    warn "  Run manually: claude mcp add --scope user supabase \\"
-    warn "    npx -y @supabase/mcp-server-supabase@latest \\"
-    warn "    --access-token <YOUR_SUPABASE_TOKEN>"
-  else
-    info "MCP: supabase (already configured)"
+  # ── Pencil (macOS 앱 번들에 포함된 바이너리) ──
+  if [[ "$OS" == "Darwin" ]]; then
+    local pencil_bin="/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-$(uname -m | sed 's/x86_64/x64/')"
+
+    if claude mcp list 2>/dev/null | grep -q "pencil"; then
+      info "MCP: pencil (already configured)"
+    elif [[ -x "$pencil_bin" ]]; then
+      if claude mcp add --scope user pencil -- "$pencil_bin" --app desktop 2>/dev/null; then
+        info "MCP: pencil (added)"
+      else
+        warn "MCP: pencil (failed to add)"
+      fi
+    else
+      warn "MCP: pencil skipped — Pencil.app not installed"
+    fi
   fi
 }
 
@@ -580,6 +614,7 @@ run_claude() {
   stow_package claude
 
   setup_claude_plugins
+  setup_claude_statusline
   setup_claude_skills
   setup_claude_mcp
 }

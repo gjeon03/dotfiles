@@ -30,9 +30,11 @@ cd ~/dotfiles
 
 ### Claude Code 프로필 (`--claude`)
 
-1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, commands/)
+1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, statusline.sh, commands/)
 2. **Plugins** — settings.json으로 관리 (재시작 시 적용)
-3. **MCP servers** — CLI로 등록 (Playwright, Sequential Thinking, Memory, Context7)
+3. **Status line** — ccstatusline 설치 여부 확인 (미설치 시 내장 fallback)
+4. **Skills** — `npx skills add`로 공개 소스 skill 설치
+5. **MCP servers** — CLI로 등록 (Playwright, Context7, Pencil)
 
 ## Structure
 
@@ -68,6 +70,7 @@ dotfiles/
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
 │       ├── settings.json          # → ~/.claude/settings.json
+│       ├── statusline.sh          # → ~/.claude/statusline.sh
 │       └── commands/              # → ~/.claude/commands/
 │           ├── branch.md
 │           ├── catchup.md
@@ -332,15 +335,19 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 | `worktree.symlinkDirectories` | `node_modules`, `.next`, `dist`, `build`, `.turbo`, `.dart_tool` | worktree 사용 시 대용량 디렉토리 심링크로 디스크 절약 |
 | `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `"1"` | Agent Teams 실험 기능 활성화 |
 | `skipDangerousModePermissionPrompt` | `true` | 위험 모드 진입 확인 스킵 |
+| `tui` | `"fullscreen"` | 전체 화면 TUI 레이아웃 |
+| `theme` | `"dark"` | 다크 테마 |
+| `agentPushNotifEnabled` | `true` | 에이전트 완료 시 푸시 알림 |
 
 **플러그인:**
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) 활성화
-- `extraKnownMarketplaces`로 OMC 마켓플레이스 소스 사전 등록 (새 머신에서 자동 발견)
+- `extraKnownMarketplaces`로 OMC / OpenAI Codex 마켓플레이스 소스 사전 등록 (새 머신에서 자동 발견)
 - 공식 마켓플레이스 플러그인:
   - `context7` — 라이브러리 최신 문서 주입
   - `security-guidance` — 파일 수정 시 보안 취약점 자동 스캔
   - `frontend-design` — UI 디자인 판단 기준 적용
   - `playwright` — 브라우저 자동화
+  - `codex` — Codex CLI 연동 (2차 진단/구현 위임)
 
 **차단된 명령어 (`permissions.deny`):**
 
@@ -353,11 +360,21 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 | `Bash(mkfs *)`, `Bash(dd if=*)` | 디스크 포맷/덮어쓰기 방지 |
 | `Read(~/.ssh/*)`, `Read(~/.aws/*)`, `Read(~/.gnupg/*)` | 민감한 인증 정보 읽기 방지 |
 
+**허용된 도구 (`permissions.allow`):**
+- `mcp__pencil` — Pencil MCP 도구는 확인 없이 사용
+
 **Hooks:**
 - `Notification`: 입력 대기 시 알림 (macOS: `osascript`, Linux: `notify-send`)
+- `Stop`: Purple Hub 세션 요약 기록. `$PURPLE_HUB_PATH`(기본 `~/obsidian/purple-hub`)에 스크립트가 있을 때만 실행되고, 없으면 조용히 건너뛴다
 
 **Status Line:**
-- `user@host:dir (branch) | Model [style] | Cost: $0.00` 형식으로 표시
+
+`statusline.sh` 래퍼가 `~/.claude/statusline.sh`로 심링크되어 두 단계로 동작한다.
+
+1. [ccstatusline](https://www.npmjs.com/package/ccstatusline)이 설치되어 있으면 사용 (PATH → npm/bun global 경로 순으로 탐색)
+2. 없으면 내장 fallback: `user@host:dir (branch) | Model [style] | Cost: $0.00`
+
+> 머신마다 다른 node/패키지 설치 경로를 하드코딩하지 않기 위한 구조. ccstatusline 설치는 `init.sh`가 물어본다.
 
 ### 커스텀 슬래시 커맨드
 
@@ -388,27 +405,27 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 |--------|------------|------|
 | `vercel-labs/skills` | find-skills | skill 생태계 탐색/설치 도우미 |
 | `vercel-labs/agent-skills` | react-best-practices, composition-patterns, web-design-guidelines | React 성능 최적화 62개 규칙, 컴포넌트 구성 패턴, UX 감사 |
-| `obra/superpowers` | systematic-debugging, brainstorming | 4단계 체계적 디버깅, 구현 전 설계 워크플로우 |
-| `anthropics/skills` | pdf | PDF 추출/생성/조작 |
+| `obra/superpowers` | systematic-debugging, brainstorming, writing-plans, subagent-driven-development, using-git-worktrees, requesting-code-review, finishing-a-development-branch | 체계적 디버깅, 구현 전 설계, 계획 작성, 서브에이전트 워크플로우, worktree 운용, 코드 리뷰 요청/브랜치 마무리 |
+| `anthropics/skills` | pdf, docx, xlsx, skill-creator | 문서 추출/생성/조작, skill 작성 도우미 |
 
-- skill을 추가하려면 `init.sh`의 `skills` 배열에 `"source|check_skill_name"` 형식으로 추가한다.
-- 플러그인 내장 skill (`frontend-design`, `skill-creator`)은 별도 설치 불필요.
+- skill을 추가하려면 `init.sh`의 `skills` 배열에 `"source|skill1 skill2 ..."` 형식으로 추가한다.
+- **공개 소스만 관리한다.** 사내 GitLab이나 로컬 프로젝트 repo(`link-forge`, `paperclip`, `purple-hub` 등)에서 심링크된 skill은 dotfiles 대상이 아니다 — 해당 repo를 클론한 머신에서만 동작한다.
+- 같은 이유로 `~/.claude/agents/`의 에이전트(`doc-searcher`, `history-writer`, `impact-analyzer`, `metadata-generator`)도 Purple Hub 전용이라 관리하지 않는다.
 
 ### MCP 서버
 
 MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth 토큰 등도 포함되어 **심링크/버전관리가 불가**하다. 따라서 `init.sh`에서 `claude mcp add --scope user` 명령어로 등록한다.
 
-| 서버 | 설명 | Transport | 등록 명령어 |
-|------|------|-----------|-------------|
-| Playwright | 브라우저 자동화/테스트 | stdio | `claude mcp add --scope user playwright npx @playwright/mcp@latest` |
-| Sequential Thinking | 복잡한 문제 단계별 사고 | stdio | `claude mcp add --scope user sequential-thinking npx -y @modelcontextprotocol/server-sequential-thinking` |
-| Memory | 세션 간 지식 그래프 유지 | stdio | `claude mcp add --scope user memory npx -y @modelcontextprotocol/server-memory` |
-| Context7 | 라이브러리 최신 문서 주입 | HTTP | `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp` |
-| Supabase | DB 쿼리/마이그레이션 | stdio | `claude mcp add --scope user supabase npx -y @supabase/mcp-server-supabase@latest --access-token <TOKEN>` |
+| 서버 | 설명 | Transport | 등록 조건 |
+|------|------|-----------|-----------|
+| Playwright | 브라우저 자동화/테스트 | stdio | 항상 |
+| Context7 | 라이브러리 최신 문서 주입 | HTTP | 항상 |
+| Pencil | 디자인(.pen) 파일 편집 | stdio | macOS + Pencil.app 설치 시 |
 
 - stdio 서버를 추가하려면 `init.sh`의 `mcp_servers` 배열에 `"이름|명령어|인자"` 형식으로 추가한다.
 - HTTP 서버를 추가하려면 `mcp_http_servers` 배열에 `"이름|URL"` 형식으로 추가한다.
-- API 키가 필요한 서버는 `setup_claude_mcp()` 하단에 안내 메시지를 추가한다.
+- Pencil은 앱 번들 내부 바이너리를 쓰므로 앱 존재를 확인한 뒤 등록한다 (`setup_claude_mcp()` 하단).
+- 사내/로컬 프로젝트에 묶인 서버(`purple-hub`, `planning-hub`)는 skills와 같은 이유로 관리하지 않는다.
 
 ### 플러그인 vs Skills vs MCP — 관리 방식 차이
 
@@ -420,6 +437,16 @@ MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth �
 | 플러그인 설치 (공식) | `~/.claude/plugins/` | X | `init.sh`에서 `claude plugins install`로 설치 |
 | Skills 설치 | `~/.agents/skills/` | X | `init.sh`에서 `npx skills add`로 설치 |
 | MCP 서버 설정 | `~/.claude.json` | X | `init.sh`에서 CLI로 등록 |
+| Status line 래퍼 | `claude/.claude/statusline.sh` | O | ccstatusline 유무에 따라 분기 |
+| ccstatusline 설치 | npm global | X | `init.sh`가 설치 여부를 물어봄 |
+
+### 새 머신에서 수동으로 필요한 것
+
+`./init.sh --claude` 이후에도 다음은 자동화되지 않는다.
+
+- Claude Code 로그인, MCP 서버 OAuth 인증
+- 사내/로컬 프로젝트 repo 클론 (해당 skill·MCP·에이전트는 그 repo가 있어야 동작)
+- Pencil.app 등 GUI 앱 설치 (앱이 없으면 관련 MCP 등록은 자동으로 건너뛴다)
 
 ---
 

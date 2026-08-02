@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${PURPLE_HUB_PATH:-~/obsidian/purple-hub}/tools/claude/hooks/session-end-summary.sh"
+            "command": "hook=\"${PURPLE_HUB_PATH:-$HOME/obsidian/purple-hub}/tools/claude/hooks/session-end-summary.sh\"; [ -f \"$hook\" ] && bash \"$hook\" || true"
           }
         ]
       }
@@ -55,7 +55,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "CCSTATUSLINE_WIDTH=400 /Users/jeongyeong-yeon/.asdf/installs/nodejs/24.15.0/bin/node /Users/jeongyeong-yeon/.bun/install/global/node_modules/ccstatusline/dist/ccstatusline.js",
+    "command": "bash \"$HOME/.claude/statusline.sh\"",
     "padding": 0
   },
   "enabledPlugins": {
