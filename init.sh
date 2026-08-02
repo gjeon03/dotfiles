@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 # init.sh — Idempotent dotfiles bootstrap (macOS + Linux)
+
+# ─── Guard: must not be sourced ──────────────────────────
+# source로 실행하면 아래 `set -e`와 스크립트 내부의 `exit`가 현재 쉘에
+# 적용되어 터미널 창이 그대로 닫힌다. 반드시 실행 파일로 동작시킨다.
+# (set -u 이전이므로 모든 참조에 기본값을 붙인다.)
+__dotfiles_sourced=0
+if [ -n "${ZSH_EVAL_CONTEXT:-}" ]; then
+  case "$ZSH_EVAL_CONTEXT" in *:file) __dotfiles_sourced=1 ;; esac
+elif [ -n "${BASH_SOURCE:-}" ]; then
+  [ "${BASH_SOURCE[0]}" != "${0:-}" ] && __dotfiles_sourced=1
+fi
+
+if [ "$__dotfiles_sourced" -eq 1 ]; then
+  printf '\033[0;31m[✗]\033[0m init.sh는 source로 실행할 수 없습니다.\n' >&2
+  printf '    실행 중단 시 터미널이 닫히므로 다음처럼 실행하세요:\n' >&2
+  printf '      ./init.sh        (또는  bash init.sh)\n' >&2
+  unset __dotfiles_sourced
+  return 1
+fi
+unset __dotfiles_sourced
+
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

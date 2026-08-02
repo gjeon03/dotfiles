@@ -18,6 +18,8 @@ cd ~/dotfiles
 ./init.sh --all      # 전체 (프롬프트 없이)
 ```
 
+> **`source init.sh` / `. init.sh`로 실행하지 말 것.** 스크립트의 `set -e`와 `exit`가 현재 쉘에 적용되어, 사전 검사(Homebrew·Stow 미설치 등)에서 중단될 때 **터미널 창이 그대로 닫힌다.** 스크립트가 source 실행을 감지하면 안내 후 중단하지만, 처음부터 `./init.sh` 또는 `bash init.sh`로 실행하는 것이 맞다.
+
 `init.sh`는 두 개의 **프로필**로 나뉜다:
 
 ### System 프로필 (`--system`)
