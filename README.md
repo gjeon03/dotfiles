@@ -33,7 +33,7 @@ cd ~/dotfiles
 
 ### Claude Code 프로필 (`--claude`)
 
-1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, statusline.sh, commands/)
+1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, statusline.sh, commands/, ccstatusline 설정)
 2. **Plugins** — settings.json으로 관리 (재시작 시 적용)
 3. **Status line** — ccstatusline 설치 여부 확인 (미설치 시 내장 fallback)
 4. **Skills** — `npx skills add`로 공개 소스 skill 설치
@@ -73,6 +73,8 @@ dotfiles/
 │   └── Library/Application Support/iTerm2/DynamicProfiles/
 │       └── dotfiles.json          # Tokyo Night 프로필
 ├── claude/                        # Claude Code 설정
+│   ├── .config/ccstatusline/
+│   │   └── settings.json          # → ~/.config/ccstatusline/settings.json
 │   └── .claude/
 │       ├── CLAUDE.md              # → ~/.claude/CLAUDE.md
 │       ├── settings.json          # → ~/.claude/settings.json
@@ -385,6 +387,15 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 
 > 머신마다 다른 node/패키지 설치 경로를 하드코딩하지 않기 위한 구조. ccstatusline 설치는 `init.sh`가 물어본다.
 
+ccstatusline의 **표시 항목 설정**은 `~/.config/ccstatusline/settings.json`에 저장되며, claude 패키지에 포함되어 stow된다.
+
+| 줄 | 항목 |
+|----|------|
+| 1행 | 모델 · git 브랜치 · git 변경 수 · 컨텍스트 바 · 세션 비용 |
+| 2행 | 블록 타이머 · 주간 사용량 · 세션 사용량 (progress bar) |
+
+> `npx ccstatusline`로 설정을 바꾸면 심링크된 dotfiles 파일이 갱신된다. 변경 후 `git diff`로 확인하고 커밋할 것.
+
 ### 커스텀 슬래시 커맨드
 
 `~/.claude/commands/`에 심링크되어 **어떤 프로젝트에서든** 사용 가능하다.
@@ -448,6 +459,7 @@ MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth �
 | MCP 서버 설정 | `~/.claude.json` | X | `init.sh`에서 CLI로 등록 |
 | Status line 래퍼 | `claude/.claude/statusline.sh` | O | ccstatusline 유무에 따라 분기 |
 | ccstatusline 설치 | npm global | X | `init.sh`가 설치 여부를 물어봄 |
+| ccstatusline 설정 | `claude/.config/ccstatusline/settings.json` | O | 상태바 표시 항목/레이아웃 |
 
 ### 새 머신에서 수동으로 필요한 것
 
