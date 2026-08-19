@@ -317,6 +317,24 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 | `cls` | `claude --dangerously-skip-permissions` |
 | `clst` | `claude --dangerously-skip-permissions --teammate-mode tmux` |
 
+**앱 실행 (macOS 전용):**
+
+| Alias | 명령 |
+|-------|------|
+| `oc` | VS Code 실행 |
+| `od` | Obsidian `obsidian-vault` 열기 |
+| `ob` | Obsidian `blog` 열기 |
+
+### 머신별 설정 (`.local`)
+
+이 repo는 **공개**되어 있으므로, 회사 관련 이름(AWS 프로필, 사내 vault)이나 이 머신에만 있는 절대 경로는 `~/.zshrc.local`(bash는 `~/.bashrc.local`)에 둔다. 두 파일 모두 `.gitignore`의 `*.local` 규칙으로 제외되며, `.zshrc` 마지막 줄에서 존재할 때만 source한다.
+
+```zsh
+[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
+```
+
+> 새 머신에서는 이 파일이 없으므로 필요한 것만 다시 작성한다.
+
 ---
 
 ## Claude Code 설정

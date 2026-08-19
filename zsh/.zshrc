@@ -77,6 +77,13 @@ alias cl="claude"
 alias cls="claude --dangerously-skip-permissions"
 alias clst="claude --dangerously-skip-permissions --teammate-mode tmux"
 
+# ─── Apps (macOS) ────────────────────────────────────────
+if [[ "$(uname)" == "Darwin" ]]; then
+  alias oc='open -a "Visual Studio Code"'
+  alias od='open "obsidian://open?vault=obsidian-vault"'
+  alias ob='open "obsidian://open?vault=blog"'
+fi
+
 # ─── asdf ────────────────────────────────────────────────
 if [[ -n "$HOMEBREW_PREFIX" && -f "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh" ]]; then
   . "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh"
