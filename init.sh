@@ -448,6 +448,50 @@ setup_claude_plugins() {
   info "  Enabled: oh-my-claudecode, codex, context7, security-guidance, frontend-design, playwright"
 }
 
+# ─── Node.js LTS (skills runtime) ────────────────────────
+setup_node_lts() {
+  local node_version="${DOTFILES_NODE_LTS_VERSION:-24.19.0}"
+
+  # Prefer the asdf-managed LTS even when Homebrew happens to provide another Node version.
+  # This makes `--all` deterministic and keeps npx available to both Claude and Codex setup.
+  if command -v asdf &>/dev/null; then
+    if ! asdf plugin list 2>/dev/null | grep -qx "nodejs"; then
+      if ! asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git; then
+        warn "Node.js: failed to add the asdf nodejs plugin"
+      fi
+    fi
+
+    if asdf plugin list 2>/dev/null | grep -qx "nodejs"; then
+      if ! asdf where nodejs "$node_version" &>/dev/null; then
+        if ! asdf install nodejs "$node_version"; then
+          warn "Node.js $node_version: asdf install failed"
+        fi
+      fi
+
+      if asdf where nodejs "$node_version" &>/dev/null; then
+        # asdf >= 0.16 uses `set`; retain compatibility with older installations.
+        if ! asdf set -u nodejs "$node_version" &>/dev/null; then
+          if ! asdf global nodejs "$node_version" &>/dev/null; then
+            warn "Node.js $node_version: failed to set the global asdf version"
+          fi
+        fi
+        asdf reshim nodejs "$node_version" &>/dev/null || true
+
+        local node_home
+        node_home="$(asdf where nodejs "$node_version")"
+        export PATH="$node_home/bin:$HOME/.asdf/shims:$PATH"
+        hash -r
+      fi
+    fi
+  fi
+
+  if command -v npx &>/dev/null; then
+    info "Node.js $(node --version) / npm $(npm --version) (skills runtime)"
+  else
+    warn "Node.js/npm not found — run the system profile first or install Node.js $node_version LTS"
+  fi
+}
+
 # ─── Claude Code: Status line ────────────────────────────
 setup_claude_statusline() {
   echo ""
@@ -476,29 +520,28 @@ setup_claude_statusline() {
   fi
 }
 
-# ─── Claude Code: Skills (npx skills) ────────────────────
-setup_claude_skills() {
+# ─── Agent Skills: shared install + native profiles ──────
+setup_agent_skills() {
   if ! command -v npx &>/dev/null; then
     warn "npx not found. Skipping skills installation."
     return
   fi
 
   echo ""
-  echo "─── Claude Code skills ───"
+  echo "─── Agent skills (Claude Code + Codex) ───"
 
-  local lock_file="$HOME/.agents/.skill-lock.json"
-
-  # "source|skill1 skill2 ..." — install specific skills from each repo
+  # "source|skill1 skill2 ...|install-or-update" — install specific skills from each repo.
   # 공개 소스만 관리한다. 사내/로컬 프로젝트 repo에서 심링크된 skill은 대상이 아니다.
   local skills=(
-    "vercel-labs/skills|find-skills"
-    "vercel-labs/agent-skills|vercel-react-best-practices vercel-composition-patterns web-design-guidelines"
-    "obra/superpowers|systematic-debugging brainstorming writing-plans executing-plans subagent-driven-development using-git-worktrees requesting-code-review finishing-a-development-branch"
-    "anthropics/skills|pdf docx xlsx skill-creator"
+    "vercel-labs/skills|find-skills|install"
+    "vercel-labs/agent-skills|vercel-react-best-practices vercel-composition-patterns web-design-guidelines|install"
+    "obra/superpowers|systematic-debugging brainstorming writing-plans executing-plans subagent-driven-development using-git-worktrees requesting-code-review finishing-a-development-branch|install"
+    "anthropics/skills|pdf docx xlsx skill-creator|install"
+    "gjeon03/agent-skills|adaptive-compute agent-relay parallel-gauntlet|update"
   )
 
   for entry in "${skills[@]}"; do
-    IFS='|' read -r source skill_names <<< "$entry"
+    IFS='|' read -r source skill_names policy <<< "$entry"
 
     local all_installed=true
     for s in $skill_names; do
@@ -509,7 +552,15 @@ setup_claude_skills() {
     done
 
     if $all_installed; then
-      info "Skill: $source (already installed)"
+      if [[ "$policy" == "update" ]]; then
+        if npx -y skills update $skill_names -g -y 2>/dev/null; then
+          info "Skill: $source (updated: $skill_names)"
+        else
+          warn "Skill: $source (update failed — keeping installed copy)"
+        fi
+      else
+        info "Skill: $source (already installed)"
+      fi
     else
       if npx -y skills add "$source" -g --skill $skill_names -y 2>/dev/null; then
         info "Skill: $source (installed: $skill_names)"
@@ -518,6 +569,23 @@ setup_claude_skills() {
       fi
     fi
   done
+
+  # npx skills installs the shared skill directory, but host-native agent profiles live in
+  # ~/.claude/agents and ~/.codex/agents. Dotfiles owns these pg-* names, so refresh them from the
+  # installed package on every bootstrap rather than duplicating their source in this repository.
+  local pg_installer="$HOME/.agents/skills/parallel-gauntlet/scripts/install.sh"
+  if [[ -f "$pg_installer" ]]; then
+    local host
+    for host in claude codex; do
+      if bash "$pg_installer" "$host" global --agents-only --force >/dev/null; then
+        info "Parallel Gauntlet agents: $host (activated)"
+      else
+        warn "Parallel Gauntlet agents: $host (activation failed)"
+      fi
+    done
+  else
+    warn "Parallel Gauntlet agents: installer not found"
+  fi
 }
 
 # ─── Claude Code: MCP Servers ────────────────────────────
@@ -669,9 +737,10 @@ run_claude() {
   echo "─── Stow packages (claude) ───"
   stow_package claude
 
+  setup_node_lts
   setup_claude_plugins
   setup_claude_statusline
-  setup_claude_skills
+  setup_agent_skills
   setup_claude_mcp
 }
 

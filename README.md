@@ -36,7 +36,7 @@ cd ~/dotfiles
 1. **Stow** — claude 패키지 (CLAUDE.md, settings.json, statusline.sh, commands/, ccstatusline 설정)
 2. **Plugins** — settings.json으로 관리 (재시작 시 적용)
 3. **Status line** — ccstatusline 설치 여부 확인 (미설치 시 내장 fallback)
-4. **Skills** — `npx skills add`로 공개 소스 skill 설치
+4. **Skills + native agents** — `npx skills`로 Claude/Codex 공용 skill을 설치하고 호스트별 agent profile 활성화
 5. **MCP servers** — CLI로 등록 (Playwright, Context7, Pencil)
 
 ## Structure
@@ -417,9 +417,15 @@ ccstatusline의 **표시 항목 설정**은 `~/.config/ccstatusline/settings.jso
 | `/task` | 프로젝트별 태스크 관리 (`tasks/` 디렉토리, 완료 시 `done/날짜/`로 이동) | `/task`, `/task add 버그 수정`, `/task done slug` |
 | `/test` | 테스트 러너 자동 감지 → 테스트 실행 → 실패 분석 | `/test`, `/test src/auth/` |
 
-### Skills (npx skills)
+### Skills + native agents (npx skills)
 
 `npx skills add <source>`로 설치되는 에이전트 스킬. `~/.agents/skills/`에 저장되고 `~/.claude/skills/`에 심링크되어 Claude Code가 자동으로 로드한다.
+
+`--claude`/`--all` 실행 시 asdf가 있으면 Node.js `24.19.0` LTS를 설치·전역 선택한 뒤 이
+런타임의 `npx`를 사용한다. 버전을 임시로 바꾸려면 `DOTFILES_NODE_LTS_VERSION` 환경변수를
+지정할 수 있다. asdf가 없는 머신은 기존 `npx`를 사용하며, 둘 다 없으면 먼저 system
+프로필에서 Brewfile 패키지를 설치해야 한다. 셸 PATH에서는 asdf shim이 Homebrew보다
+앞서므로 새 터미널에서도 같은 LTS가 선택된다.
 
 | Source | 포함 Skills | 설명 |
 |--------|------------|------|
@@ -427,8 +433,13 @@ ccstatusline의 **표시 항목 설정**은 `~/.config/ccstatusline/settings.jso
 | `vercel-labs/agent-skills` | react-best-practices, composition-patterns, web-design-guidelines | React 성능 최적화 62개 규칙, 컴포넌트 구성 패턴, UX 감사 |
 | `obra/superpowers` | systematic-debugging, brainstorming, writing-plans, subagent-driven-development, using-git-worktrees, requesting-code-review, finishing-a-development-branch | 체계적 디버깅, 구현 전 설계, 계획 작성, 서브에이전트 워크플로우, worktree 운용, 코드 리뷰 요청/브랜치 마무리 |
 | `anthropics/skills` | pdf, docx, xlsx, skill-creator | 문서 추출/생성/조작, skill 작성 도우미 |
+| `gjeon03/agent-skills` | adaptive-compute, agent-relay, parallel-gauntlet | 개인 adaptive compute, 교차 에이전트 relay, 품질·병렬 실행 컨트롤러 |
 
-- skill을 추가하려면 `init.sh`의 `skills` 배열에 `"source|skill1 skill2 ..."` 형식으로 추가한다.
+- skill을 추가하려면 `init.sh`의 `skills` 배열에 `"source|skill1 skill2 ...|install-or-update"` 형식으로 추가한다.
+- 개인 `gjeon03/agent-skills`는 이미 설치되어 있어도 `skills update`로 최신 버전을 확인한다.
+- Parallel Gauntlet 설치 후 `init.sh`가 패키지의 `--agents-only` 경로를 실행해 Claude의
+  `~/.claude/agents/pg-*.md`와 Codex의 `~/.codex/agents/pg-*.toml`을 함께 활성화한다.
+- `pg-*` 정의의 원본은 `agent-skills` 레포 한 곳에만 두며 dotfiles에는 복제하지 않는다.
 - **공개 소스만 관리한다.** 사내 GitLab이나 로컬 프로젝트 repo(`link-forge`, `paperclip`, `purple-hub` 등)에서 심링크된 skill은 dotfiles 대상이 아니다 — 해당 repo를 클론한 머신에서만 동작한다.
 - 같은 이유로 `~/.claude/agents/`의 에이전트(`doc-searcher`, `history-writer`, `impact-analyzer`, `metadata-generator`)도 Purple Hub 전용이라 관리하지 않는다.
 
@@ -456,6 +467,7 @@ MCP 서버 설정은 `~/.claude.json`에 저장되며, 이 파일에는 OAuth �
 | 플러그인 설치 (OMC) | `~/.claude/plugins/` | X | `init.sh`에서 CLI로 설치 |
 | 플러그인 설치 (공식) | `~/.claude/plugins/` | X | `init.sh`에서 `claude plugins install`로 설치 |
 | Skills 설치 | `~/.agents/skills/` | X | `init.sh`에서 `npx skills add`로 설치 |
+| Parallel Gauntlet native agents | `~/.claude/agents/`, `~/.codex/agents/` | X | 설치된 skill의 host adapter를 `init.sh`가 활성화 |
 | MCP 서버 설정 | `~/.claude.json` | X | `init.sh`에서 CLI로 등록 |
 | Status line 래퍼 | `claude/.claude/statusline.sh` | O | ccstatusline 유무에 따라 분기 |
 | ccstatusline 설치 | npm global | X | `init.sh`가 설치 여부를 물어봄 |

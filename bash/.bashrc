@@ -78,7 +78,6 @@ if [[ -n "$HOMEBREW_PREFIX" && -f "$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh" ]]
 elif [[ -f "$HOME/.asdf/asdf.sh" ]]; then
   . "$HOME/.asdf/asdf.sh"
 fi
-export PATH="$HOME/.asdf/shims:$PATH"
 
 # ─── pnpm ────────────────────────────────────────────────
 case "$(uname)" in
@@ -94,6 +93,7 @@ esac
 [[ -n "$HOMEBREW_PREFIX" ]] && export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.asdf/shims:$PATH"
 
 # ─── Prompt (git-aware) ──────────────────────────────────
 __git_branch() {
