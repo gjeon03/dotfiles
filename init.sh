@@ -387,6 +387,25 @@ backup_existing() {
   fi
 }
 
+# Back up foreign symlinked directories that would block stow.
+# e.g. ~/.config/nvim → ~/.SpaceVim: stow refuses to overwrite a link it does
+# not own, and backup_existing() skips it because it only handles real files.
+backup_foreign_dirs() {
+  local pkg="$1"
+  while IFS= read -r -d '' dir; do
+    local rel="${dir#"$DOTFILES_DIR/$pkg/"}"
+    local dest="$HOME/$rel"
+    [[ -L "$dest" ]] || continue
+    [[ "$(readlink "$dest")" == "$DOTFILES_DIR"/* ]] && continue  # already ours
+    warn "Conflict: $dest is a symlink → $(readlink "$dest")"
+    local backup="${dest}.backup.$(date +%Y%m%d%H%M%S)"
+    mv "$dest" "$backup"
+    warn "Backed up: $dest → $backup"
+  done < <(find "$DOTFILES_DIR/$pkg" -mindepth 1 -type d -print0)
+}
+
+STOW_FAILURES=()
+
 stow_package() {
   local pkg="$1"
   if [[ ! -d "$DOTFILES_DIR/$pkg" ]]; then
@@ -400,9 +419,25 @@ stow_package() {
     backup_existing "$dest" "$target"
   done < <(find "$DOTFILES_DIR/$pkg" -type f -print0)
 
+  backup_foreign_dirs "$pkg"
+
   cd "$DOTFILES_DIR"
-  stow --restow --no-folding -t "$HOME" "$pkg"
-  info "Stowed: $pkg"
+  # Never abort the whole run on one bad package — a single conflict used to
+  # kill the script via `set -e`, silently skipping every later package.
+  if stow --restow --no-folding -t "$HOME" "$pkg"; then
+    info "Stowed: $pkg"
+  else
+    warn "Failed to stow: $pkg (skipped)"
+    STOW_FAILURES+=("$pkg")
+  fi
+}
+
+report_stow_failures() {
+  if [[ ${#STOW_FAILURES[@]} -gt 0 ]]; then
+    echo ""
+    warn "Packages not stowed: ${STOW_FAILURES[*]}"
+    warn "Resolve the conflicts above, then re-run ./init.sh"
+  fi
 }
 
 # ─── Claude Code: Plugins ────────────────────────────────
@@ -458,7 +493,7 @@ setup_claude_skills() {
   local skills=(
     "vercel-labs/skills|find-skills"
     "vercel-labs/agent-skills|vercel-react-best-practices vercel-composition-patterns web-design-guidelines"
-    "obra/superpowers|systematic-debugging brainstorming writing-plans subagent-driven-development using-git-worktrees requesting-code-review finishing-a-development-branch"
+    "obra/superpowers|systematic-debugging brainstorming writing-plans executing-plans subagent-driven-development using-git-worktrees requesting-code-review finishing-a-development-branch"
     "anthropics/skills|pdf docx xlsx skill-creator"
   )
 
@@ -701,6 +736,8 @@ main() {
       run_claude
       ;;
   esac
+
+  report_stow_failures
 
   echo ""
   info "Done. Restart your shell if needed."
