@@ -28,7 +28,7 @@ cd ~/dotfiles
 2. **Packages** — macOS: `Brewfile`, Linux: `packages.{apt,dnf,pacman}`으로 CLI 도구 설치
 3. **Shell selection** — zsh 또는 bash 선택
 4. **Shell setup** — zsh: oh-my-zsh, 플러그인, Powerlevel10k / bash: 추가 설정 불필요
-5. **Stow packages** — git, tmux, nvim, yazi, 선택된 쉘 + macOS에서 karabiner, wezterm, iterm2, ghostty
+5. **Stow packages** — git, tmux, nvim, yazi, bat, 선택된 쉘 + macOS에서 karabiner, wezterm, iterm2, ghostty
 6. **iTerm2 프로필** — 동적 프로필(`dotfiles-tokyo-night`)을 기본값으로 지정 (macOS)
 
 ### Claude Code 프로필 (`--claude`)
@@ -64,6 +64,9 @@ dotfiles/
 │   └── .config/karabiner/         # → ~/.config/karabiner/
 ├── wezterm/                       # WezTerm 터미널 설정
 │   └── .wezterm.lua               # → ~/.wezterm.lua
+├── bat/                           # bat 테마
+│   └── .config/bat/themes/        # → ~/.config/bat/themes/
+│       └── tokyonight_night.tmTheme
 ├── yazi/                          # Yazi 파일 매니저 설정
 │   └── .config/yazi/              # → ~/.config/yazi/
 ├── ghostty/                       # Ghostty 터미널 설정
@@ -282,7 +285,7 @@ Homebrew 없는 Linux에서 네이티브 패키지 매니저를 사용:
 
 | Alias | 명령 | 설명 |
 |-------|------|------|
-| `cat` | `bat` | 구문 강조, 테마: `tokyonight_night` |
+| `cat` | `bat` | 구문 강조, 테마: `tokyonight_night` (bat 패키지가 제공) |
 | `ls` | `eza --icons` | 파일 타입 아이콘 표시 |
 | `ll` | `eza -la --icons --git` | 상세 목록 + git 상태 |
 | `lt` | `eza --tree --icons --level=2` | 2단계 트리 뷰 |

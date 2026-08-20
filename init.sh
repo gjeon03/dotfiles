@@ -387,21 +387,36 @@ backup_existing() {
   fi
 }
 
-# Back up foreign symlinked directories that would block stow.
-# e.g. ~/.config/nvim → ~/.SpaceVim: stow refuses to overwrite a link it does
-# not own, and backup_existing() skips it because it only handles real files.
-backup_foreign_dirs() {
+# Resolve a symlink's target to an absolute path. stow writes relative links,
+# so readlink alone cannot tell "ours" from "another repo's".
+resolve_link() {
+  local link="$1"
+  local target
+  target="$(readlink "$link")"
+  [[ "$target" != /* ]] && target="$(dirname "$link")/$target"
+  local dir
+  dir="$(cd "$(dirname "$target")" 2>/dev/null && pwd -P)" || return 1
+  echo "$dir/$(basename "$target")"
+}
+
+# Back up foreign symlinks — files and directories alike — that would block stow.
+# e.g. ~/.config/nvim → ~/old-dotfiles/nvim, or ~/.tmux.conf → ~/old-dotfiles/.tmux.conf.
+# stow refuses to overwrite a link it does not own, and backup_existing() skips
+# every symlink because it only handles real files.
+backup_foreign_links() {
   local pkg="$1"
-  while IFS= read -r -d '' dir; do
-    local rel="${dir#"$DOTFILES_DIR/$pkg/"}"
+  while IFS= read -r -d '' entry; do
+    local rel="${entry#"$DOTFILES_DIR/$pkg/"}"
     local dest="$HOME/$rel"
     [[ -L "$dest" ]] || continue
-    [[ "$(readlink "$dest")" == "$DOTFILES_DIR"/* ]] && continue  # already ours
-    warn "Conflict: $dest is a symlink → $(readlink "$dest")"
+    local target
+    target="$(resolve_link "$dest")" || target="$(readlink "$dest")"
+    [[ "$target" == "$DOTFILES_DIR"/* ]] && continue  # already ours
+    warn "Conflict: $dest is a symlink → $target"
     local backup="${dest}.backup.$(date +%Y%m%d%H%M%S)"
     mv "$dest" "$backup"
     warn "Backed up: $dest → $backup"
-  done < <(find "$DOTFILES_DIR/$pkg" -mindepth 1 -type d -print0)
+  done < <(find "$DOTFILES_DIR/$pkg" -mindepth 1 \( -type d -o -type f \) -print0)
 }
 
 STOW_FAILURES=()
@@ -419,7 +434,7 @@ stow_package() {
     backup_existing "$dest" "$target"
   done < <(find "$DOTFILES_DIR/$pkg" -type f -print0)
 
-  backup_foreign_dirs "$pkg"
+  backup_foreign_links "$pkg"
 
   cd "$DOTFILES_DIR"
   # Never abort the whole run on one bad package — a single conflict used to
@@ -706,7 +721,7 @@ run_system() {
   echo ""
   echo "─── Stow packages (system) ───"
 
-  local packages=(git tmux nvim yazi)
+  local packages=(git tmux nvim yazi bat)
 
   if [[ "$CHOSEN_SHELL" == "zsh" ]]; then
     packages+=(zsh)
@@ -721,6 +736,13 @@ run_system() {
   for pkg in "${packages[@]}"; do
     stow_package "$pkg"
   done
+
+  # bat only sees a custom theme after its cache is rebuilt
+  if command -v bat &>/dev/null; then
+    bat cache --build &>/dev/null && info "bat theme cache rebuilt"
+  elif command -v batcat &>/dev/null; then
+    batcat cache --build &>/dev/null && info "bat theme cache rebuilt"
+  fi
 
   # macOS app settings
   if [[ "$OS" == "Darwin" ]]; then
